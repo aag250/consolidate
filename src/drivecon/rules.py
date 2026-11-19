@@ -78,6 +78,27 @@ class Rules:
                 return decision, pat
         return None
 
+    def add_decision(self, ext: str, decision: str) -> None:
+        """Apply an answered prompt for the rest of this run."""
+        self._ext[ext.lower()] = (decision, f"decided:{ext.lower()}")
+
+    def excluded_dir(self, segs: list[str]) -> str | None:
+        """The exclusion pattern that prunes the directory ``segs``, if any."""
+        for exc in self._pr.exclusions:
+            if exc.os not in ("any", self._os):
+                continue
+            for pat in exc.patterns:
+                if match_segments(split_path(pat), segs, self._ci, whole=False):
+                    return pat
+        return None
+
+    def resolve_ext(self, ext: str, rule_prefix: str = "") -> Decision:
+        """Decide by extension alone (used for sniffed files)."""
+        ftype = self.file_type(ext)
+        if ftype is None:
+            return Decision("pending", f"unknown:{ext}", ext)
+        return Decision(ftype[0], rule_prefix + ftype[1], ext)  # type: ignore[arg-type]
+
     def classify(self, path: str, size: int) -> Decision:
         segs = split_path(path)
         if not segs:

@@ -28,6 +28,7 @@ syrupy = "*"
 ruff = "*"
 mypy = "*"
 types-pyyaml = "*"
+types-pexpect = "^4.9.0.20260518"
 
 [tool.poetry.scripts]
 drivecon = "drivecon.cli:app"

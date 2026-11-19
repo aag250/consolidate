@@ -1,0 +1,19 @@
+# Synthetic Windows 7/10 profile with AppData.
+seed: 2
+files:
+  - path: "Users/u1/Documents/report.docx"
+    size: 100
+  - path: "Users/u1/Documents/data.weird"
+    size: 20
+  - path: "Users/u1/Documents/data2.weird"
+    size: 30
+  - path: "Users/u1/AppData/Roaming/app/notes.docx"
+    size: 10
+  - path: "Users/u1/AppData/Local/Microsoft/Outlook/mail.pst"
+    size: 500
+  - path: "Users/u1/AppData/Local/Microsoft/Outlook/other.dat"
+    size: 5
+  - path: "Program Files/App/readme.txt"
+    size: 5
+  - path: "Users/u1/Pictures/photo.jpg"
+    size: 300

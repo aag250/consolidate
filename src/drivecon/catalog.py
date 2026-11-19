@@ -157,7 +157,8 @@ class Catalog:
             self._adopt_newer_copy()
         else:
             self.db_file = self.dest_file
-        self.conn = sqlite3.connect(self.db_file)
+        # One thread at a time uses the connection (the scan worker, then the main thread).
+        self.conn = sqlite3.connect(self.db_file, check_same_thread=False)
         self.conn.execute("PRAGMA journal_mode=DELETE")
         self.conn.execute("PRAGMA foreign_keys=ON")
         self._init_schema()

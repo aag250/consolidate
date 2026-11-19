@@ -1422,6 +1422,18 @@ rich = ">=13.8.0"
 shellingham = ">=1.3.0"
 
 [[package]]
+name = "types-pexpect"
+version = "4.9.0.20260518"
+description = "Typing stubs for pexpect"
+optional = false
+python-versions = ">=3.10"
+groups = ["dev"]
+files = [
+    {file = "types_pexpect-4.9.0.20260518-py3-none-any.whl", hash = "sha256:bf2422e825e4efe29cc4a1b7bdc3c375ae97d9c3046ce6b2018c100fb049c262"},
+    {file = "types_pexpect-4.9.0.20260518.tar.gz", hash = "sha256:38c373798209428dd90988b6fd4b8839c68c7e3ed79215f1ab11fa42d7ff9427"},
+]
+
+[[package]]
 name = "types-pyyaml"
 version = "6.0.12.20261113"
 description = "Typing stubs for PyYAML"
@@ -1463,4 +1475,4 @@ typing-extensions = ">=4.15.0"
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.12,<3.13"
-content-hash = "7304fd45f4e7dc9ee7b9d0e2e98043a02e66c60e60b55b08125979dfb3f32611"
+content-hash = "7d9ff508810093d4ab35e11fb476e924c09d284bdf399cb3ee7f3cc1f4f9c982"
