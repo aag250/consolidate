@@ -13,10 +13,20 @@ from drivecon.catalog import Catalog
 from drivecon.config import load_file_types, load_path_rules
 from drivecon.copier import CopyStats, DestinationFull, copy_source, verify
 from drivecon.hashing import HashStats, HashWorker
-from drivecon.intake import human, run_intake, synthetic_device
+from drivecon.intake import append_results, human, run_intake, synthetic_device
 from drivecon.pending import PendingInfo, PendingTracker, release_decided
 from drivecon.photos import exif_date
 from drivecon.placement import Placer
+from drivecon.reports import (
+    conflict_rows,
+    renamed_rows,
+    results_block,
+    sources_table,
+    summarize,
+    summarize_all,
+    where,
+    write_reports,
+)
 from drivecon.rules import Rules
 from drivecon.scan import Scanner, ScanStats
 from drivecon.session import apply_answer, ask_extension, run_scan_session
@@ -274,6 +284,19 @@ def _copy_phase(
     )  # fmt: skip
 
 
+def _record_results(cat: Catalog, sid: int, dest: Path) -> None:
+    """Append this drive's results to its intake sheet and refresh _reports/."""
+    summary = summarize(cat, sid)
+    sheet = dest / "_intake" / f"{summary.label}.txt"
+    if sheet.exists():
+        append_results(sheet, results_block(summary, dt.date.today()))
+    write_reports(cat, dest)
+    verdict = "safe to retire" if summary.retire_safe else "NOT safe to retire yet"
+    typer.echo(f"{summary.label}: {verdict}")
+    for r in summary.reasons:
+        typer.echo(f"  - {r}")
+
+
 def _finish_copy(stats: CopyStats) -> None:
     typer.echo(
         f"Copied {stats.copied} files ({human(stats.bytes)}); {stats.duplicates} duplicates "
@@ -320,6 +343,7 @@ def copy(
         sid, _ = _source(cat, label)
         stats = _copy_phase(cat, sid, sources_root / label, config, dest, threading.Event())
         _finish_copy(stats)
+        _record_results(cat, sid, dest)
     except DestinationFull:
         typer.echo("Destination is full. Free some space and re-run.", err=True)
         code = 4
@@ -364,6 +388,7 @@ def run(
             code = 130
         else:
             _finish_copy(_copy_phase(cat, sid, root, config, dest, threading.Event()))
+            _record_results(cat, sid, dest)
             held = res.stats.pending - res.released
             if held > 0:
                 typer.echo(f"{held} files held for unknown extensions; run `decide`.")
@@ -441,3 +466,74 @@ def report_errors(
         typer.echo("No errors.")
     for label, path, err in rows:
         typer.echo(f"{label}: {path}: {err}")
+
+
+@report_app.command("sources")
+def report_sources(
+    dest: DestOpt = Path("/dest"),
+    catalog_mode: ModeOpt = "native",
+    work_dir: WorkOpt = None,
+) -> None:
+    """Files, bytes and new unique files per source, with the retire-safe flag."""
+    cat = open_catalog(dest, catalog_mode, work_dir)
+    try:
+        rows = summarize_all(cat)
+    finally:
+        cat.close()
+    typer.echo(sources_table(rows) if rows else "No sources registered.")
+
+
+@report_app.command("conflicts")
+def report_conflicts(
+    dest: DestOpt = Path("/dest"),
+    catalog_mode: ModeOpt = "native",
+    work_dir: WorkOpt = None,
+) -> None:
+    """Different files that mapped to the same path; both are kept."""
+    cat = open_catalog(dest, catalog_mode, work_dir)
+    try:
+        rows = conflict_rows(cat)
+    finally:
+        cat.close()
+    if not rows:
+        typer.echo("No conflicts.")
+    for wanted, chosen, label, _h in rows:
+        typer.echo(f"{wanted}  ->  {chosen}  [{label}]")
+
+
+@report_app.command("renamed")
+def report_renamed(
+    dest: DestOpt = Path("/dest"),
+    catalog_mode: ModeOpt = "native",
+    work_dir: WorkOpt = None,
+) -> None:
+    """Paths changed to suit NTFS (forbidden characters, reserved names, length)."""
+    cat = open_catalog(dest, catalog_mode, work_dir)
+    try:
+        rows = renamed_rows(cat)
+    finally:
+        cat.close()
+    if not rows:
+        typer.echo("No renamed paths.")
+    for original, new, _h in rows:
+        typer.echo(f"{original}  ->  {new}")
+
+
+@app.command(name="where")
+def where_cmd(
+    path_or_hash: str,
+    dest: DestOpt = Path("/dest"),
+    catalog_mode: ModeOpt = "native",
+    work_dir: WorkOpt = None,
+) -> None:
+    """Every original location of a file, by path (or part of one) or BLAKE3 hash."""
+    cat = open_catalog(dest, catalog_mode, work_dir)
+    try:
+        rows = where(cat, path_or_hash)
+    finally:
+        cat.close()
+    if not rows:
+        typer.echo("Not found.")
+        raise typer.Exit(1)
+    for label, rel, status, dest_path in rows:
+        typer.echo(f"{label}: {rel}  [{status}]  -> {dest_path}")
