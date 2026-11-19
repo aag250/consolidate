@@ -111,7 +111,8 @@ class Scanner:
     # --- walking ----------------------------------------------------------------------
 
     def run(self) -> ScanStats:
-        self.cat.conn.execute("DELETE FROM excluded_dirs WHERE source_id=?", (self.sid,))
+        with self.cat.lock:
+            self.cat.conn.execute("DELETE FROM excluded_dirs WHERE source_id=?", (self.sid,))
         stack: list[list[str]] = [[]]
         while stack and not self.stop.is_set():
             segs = stack.pop()
@@ -139,13 +140,14 @@ class Scanner:
                 except OSError as e:
                     self._record_error("/".join(child), e)
             stack.extend(reversed(subdirs))
-        self._flush_excluded()
-        refresh_pending(self.cat, self.cat.clock())
-        if not self.stop.is_set():
-            self.cat.conn.execute(
-                "UPDATE sources SET last_scan_at=? WHERE id=?", (self._now, self.sid)
-            )
-        self._commit()
+        with self.cat.lock:
+            self._flush_excluded()
+            refresh_pending(self.cat, self.cat.clock())
+            if not self.stop.is_set():
+                self.cat.conn.execute(
+                    "UPDATE sources SET last_scan_at=? WHERE id=?", (self._now, self.sid)
+                )
+            self._commit()
         return self.stats
 
     def _walk_excluded(self, top: list[str], pattern: str) -> None:
@@ -202,32 +204,34 @@ class Scanner:
 
     def _upsert(self, rel: str, st: os.stat_result, d: Decision, mime: str) -> None:
         pending = d.action == "pending"
-        self.cat.conn.execute(
-            UPSERT,
-            (
-                self.sid, os.fsencode(rel), rel.encode("utf-8", "replace").decode(),
-                st.st_size, st.st_mtime, st.st_ctime, d.ext, mime or None, d.action,
-                d.rule, "pending_decision" if pending else "seen", None, self._now,
-            ),
-        )  # fmt: skip
+        with self.cat.lock:
+            self.cat.conn.execute(
+                UPSERT,
+                (
+                    self.sid, os.fsencode(rel), rel.encode("utf-8", "replace").decode(),
+                    st.st_size, st.st_mtime, st.st_ctime, d.ext, mime or None, d.action,
+                    d.rule, "pending_decision" if pending else "seen", None, self._now,
+                ),
+            )  # fmt: skip
+            self._uncommitted += 1
+            if self._uncommitted >= self.batch_size:
+                self._commit()
         if pending:
             self.stats.pending += 1
             self.tracker.add(d.ext, rel, st.st_size)
         else:
             self.stats.included += 1
             self.stats.included_bytes += st.st_size
-        self._uncommitted += 1
-        if self._uncommitted >= self.batch_size:
-            self._commit()
 
     def _record_error(self, rel: str, err: OSError) -> None:
         self.stats.errors += 1
-        self.cat.conn.execute(
-            UPSERT,
-            (self.sid, os.fsencode(rel), rel.encode("utf-8", "replace").decode(),
-             None, None, None, "", None, "error", "read-error", "error", str(err), self._now),
-        )  # fmt: skip
-        self._uncommitted += 1
+        with self.cat.lock:
+            self.cat.conn.execute(
+                UPSERT,
+                (self.sid, os.fsencode(rel), rel.encode("utf-8", "replace").decode(),
+                 None, None, None, "", None, "error", "read-error", "error", str(err), self._now),
+            )  # fmt: skip
+            self._uncommitted += 1
 
     def _count_excluded(self, dir_segs: list[str], rule: str, size: int) -> None:
         key = ("/".join(dir_segs), rule)
@@ -246,10 +250,11 @@ class Scanner:
             )
 
     def _commit(self) -> None:
-        fault.checkpoint("scan.batch_commit")
-        refresh_pending(self.cat, self.cat.clock())
-        self.cat.commit()
-        self._uncommitted = 0
+        with self.cat.lock:
+            fault.checkpoint("scan.batch_commit")
+            refresh_pending(self.cat, self.cat.clock())
+            self.cat.commit()
+            self._uncommitted = 0
 
 
 def default_now() -> dt.datetime:

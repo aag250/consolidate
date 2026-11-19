@@ -14,6 +14,7 @@ from __future__ import annotations
 import datetime as dt
 import os
 import sqlite3
+import threading
 from collections.abc import Callable, Iterator
 from contextlib import contextmanager
 from pathlib import Path
@@ -149,6 +150,8 @@ class Catalog:
             raise ValueError("wsl mode needs work_dir on a Linux filesystem")
         self.mode = mode
         self.clock = clock
+        # Threads share one connection; hold this around every group of statements.
+        self.lock = threading.RLock()
         self.dest_file = dest_dir / "_catalog" / "catalog.sqlite"
         self.backup_dir = dest_dir / "_catalog" / "backups"
         self.dest_file.parent.mkdir(parents=True, exist_ok=True)
@@ -192,13 +195,14 @@ class Catalog:
 
     def commit(self) -> None:
         """Commit the open batch, bump the generation and, in WSL mode, sync to the drive."""
-        self.conn.execute(
-            "UPDATE meta SET value = CAST(value AS INTEGER) + 1 WHERE key='generation'"
-        )
-        self.conn.commit()
-        fault.checkpoint("catalog.after_commit")
-        if self.mode == "wsl":
-            self.sync_to_dest()
+        with self.lock:
+            self.conn.execute(
+                "UPDATE meta SET value = CAST(value AS INTEGER) + 1 WHERE key='generation'"
+            )
+            self.conn.commit()
+            fault.checkpoint("catalog.after_commit")
+            if self.mode == "wsl":
+                self.sync_to_dest()
 
     def sync_to_dest(self) -> None:
         _atomic_copy_db(self.conn, self.dest_file, hook="catalog.sync_copy")

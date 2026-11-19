@@ -12,6 +12,7 @@ import typer
 
 from drivecon.catalog import Catalog
 from drivecon.config import record_decision
+from drivecon.hashing import HashWorker
 from drivecon.pending import PendingInfo, PendingTracker, release_decided
 from drivecon.rules import Rules
 from drivecon.scan import Scanner, ScanStats, Sniffer, sniff_mime
@@ -71,6 +72,7 @@ def run_scan_session(
     progress_every: int = 1000,
     throttle: float = 0.0,
     batch_size: int = 1000,
+    hasher: HashWorker | None = None,
 ) -> SessionResult:
     tracker = PendingTracker()
     stop = threading.Event()
@@ -86,8 +88,19 @@ def run_scan_session(
         except BaseException as e:  # reported on the main thread after the join
             errors.append(e)
 
+    def hash_work() -> None:
+        try:
+            assert hasher is not None
+            hasher.run()
+        except BaseException as e:
+            errors.append(e)
+
     thread = threading.Thread(target=work, name="scan", daemon=True)
+    hash_thread = threading.Thread(target=hash_work, name="hash", daemon=True)
     result = SessionResult(scanner.stats)
+    if hasher:
+        hasher.stop = stop
+        hash_thread.start()
     thread.start()
     try:
         while True:
@@ -112,6 +125,14 @@ def run_scan_session(
         raise RuntimeError("scan worker did not stop in time")
     if errors:
         raise errors[0]
-    result.released = release_decided(cat, rules, cat.clock())
-    cat.commit()
+    with cat.lock:
+        result.released = release_decided(cat, rules, cat.clock())
+        cat.commit()
+    if hasher:
+        hasher.scan_done.set()  # released files are now 'seen'; hash the stragglers, then stop
+        hash_thread.join(JOIN_TIMEOUT if stop.is_set() else None)
+        if hash_thread.is_alive():
+            raise RuntimeError("hash worker did not stop in time")
+        if errors:
+            raise errors[0]
     return result

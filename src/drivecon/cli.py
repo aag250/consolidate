@@ -3,6 +3,7 @@ import json
 import os
 import sys
 import tempfile
+import threading
 from pathlib import Path
 from typing import Annotated, Literal, cast
 
@@ -10,8 +11,12 @@ import typer
 
 from drivecon.catalog import Catalog
 from drivecon.config import load_file_types, load_path_rules
+from drivecon.copier import CopyStats, DestinationFull, copy_source, verify
+from drivecon.hashing import HashStats, HashWorker
 from drivecon.intake import human, run_intake, synthetic_device
 from drivecon.pending import PendingInfo, PendingTracker, release_decided
+from drivecon.photos import exif_date
+from drivecon.placement import Placer
 from drivecon.rules import Rules
 from drivecon.scan import Scanner, ScanStats
 from drivecon.session import apply_answer, ask_extension, run_scan_session
@@ -110,6 +115,12 @@ def _test_hooks() -> tuple[float, int]:
         float(os.environ.get("CONSOLIDATE_THROTTLE", "0")),
         int(os.environ.get("CONSOLIDATE_PROGRESS_EVERY", "1000")),
     )
+
+
+def _batches() -> tuple[int, int, int]:
+    """Commit batch sizes for scan, hash and copy; CONSOLIDATE_BATCH overrides (tests)."""
+    n = int(os.environ.get("CONSOLIDATE_BATCH", "0"))
+    return (n, n, n) if n else (1000, 100, 100)
 
 
 def _source(cat: Catalog, label: str) -> tuple[int, str | None]:
@@ -240,3 +251,193 @@ def report_types(
     for ext, count, total, examples in rows:
         first = (json.loads(examples or "[]") or [""])[0]
         typer.echo(f".{ext:<12} {count:>7} files {human(total):>10}   e.g. {first}")
+
+
+def _hash_progress(stats: HashStats) -> None:
+    typer.echo(f"[hash] {stats.hashed} files, {human(stats.bytes)}")
+
+
+def _copy_progress(stats: CopyStats) -> None:
+    typer.echo(f"[copy] {stats.copied} copied, {stats.duplicates} duplicates")
+
+
+def _copy_phase(
+    cat: Catalog, sid: int, root: Path, config: Path, dest: Path, stop: threading.Event
+) -> CopyStats:
+    _, _, copy_batch = _batches()
+    pr = load_path_rules(config / "paths.toml")
+    throttle, every = _test_hooks()
+    return copy_source(
+        cat, sid, root, Placer(cat, pr), dest, exif=exif_date,
+        photo_exts=frozenset(pr.photos.extensions), stop=stop,
+        progress=_copy_progress, progress_every=every, throttle=throttle, batch=copy_batch,
+    )  # fmt: skip
+
+
+def _finish_copy(stats: CopyStats) -> None:
+    typer.echo(
+        f"Copied {stats.copied} files ({human(stats.bytes)}); {stats.duplicates} duplicates "
+        f"recorded; errors {stats.errors}; changed during copy {stats.changed}"
+    )
+
+
+@app.command(name="hash")
+def hash_cmd(
+    label: str,
+    dest: DestOpt = Path("/dest"),
+    sources_root: SourcesOpt = Path("/sources"),
+    catalog_mode: ModeOpt = "native",
+    work_dir: WorkOpt = None,
+) -> None:
+    """Hash included files that are not hashed yet."""
+    cat = open_catalog(dest, catalog_mode, work_dir)
+    try:
+        sid, _ = _source(cat, label)
+        throttle, every = _test_hooks()
+        worker = HashWorker(cat, sid, sources_root / label, progress=_hash_progress,
+                            progress_every=every, throttle=throttle,
+                            batch=_batches()[1])  # fmt: skip
+        worker.scan_done.set()
+        stats = worker.run()
+    finally:
+        cat.close()
+    typer.echo(f"Hashed {stats.hashed} files ({human(stats.bytes)}); errors {stats.errors}")
+
+
+@app.command()
+def copy(
+    label: str,
+    dest: DestOpt = Path("/dest"),
+    config: ConfigOpt = Path("/config"),
+    sources_root: SourcesOpt = Path("/sources"),
+    catalog_mode: ModeOpt = "native",
+    work_dir: WorkOpt = None,
+) -> None:
+    """Place and copy new files to Files/, verifying each."""
+    cat = open_catalog(dest, catalog_mode, work_dir)
+    code = 0
+    try:
+        sid, _ = _source(cat, label)
+        stats = _copy_phase(cat, sid, sources_root / label, config, dest, threading.Event())
+        _finish_copy(stats)
+    except DestinationFull:
+        typer.echo("Destination is full. Free some space and re-run.", err=True)
+        code = 4
+    except KeyboardInterrupt:
+        typer.echo("Interrupted; re-run to continue.", err=True)
+        code = 130
+    finally:
+        cat.close()
+    if code:
+        raise typer.Exit(code)
+
+
+@app.command()
+def run(
+    label: str,
+    dest: DestOpt = Path("/dest"),
+    config: ConfigOpt = Path("/config"),
+    sources_root: SourcesOpt = Path("/sources"),
+    os_kind: OsOpt = "auto",
+    catalog_mode: ModeOpt = "native",
+    work_dir: WorkOpt = None,
+) -> None:
+    """Scan, hash and copy a source in sequence, with unknown-extension prompts."""
+    cat = open_catalog(dest, catalog_mode, work_dir)
+    code = 0
+    try:
+        sid, fs_type = _source(cat, label)
+        rules = load_rules(config, os_kind, fs_type)
+        root = sources_root / label
+        throttle, every = _test_hooks()
+        scan_batch, hash_batch, _ = _batches()
+        hasher = HashWorker(cat, sid, root, progress=_hash_progress, progress_every=every,
+                            throttle=throttle, batch=hash_batch)  # fmt: skip
+        res = run_scan_session(
+            cat, sid, root, rules, config / "file-types.toml", interactive=sys.stdin.isatty(),
+            today=dt.date.today(), progress=_progress, progress_every=every,
+            throttle=throttle, hasher=hasher, batch_size=scan_batch,
+        )  # fmt: skip
+        _summarize(res.stats)
+        if res.interrupted:
+            typer.echo("Interrupted; re-run to continue.", err=True)
+            code = 130
+        else:
+            _finish_copy(_copy_phase(cat, sid, root, config, dest, threading.Event()))
+            held = res.stats.pending - res.released
+            if held > 0:
+                typer.echo(f"{held} files held for unknown extensions; run `decide`.")
+    except DestinationFull:
+        typer.echo("Destination is full. Free some space and re-run.", err=True)
+        code = 4
+    except KeyboardInterrupt:
+        typer.echo("Interrupted; re-run to continue.", err=True)
+        code = 130
+    finally:
+        cat.close()
+    if code:
+        raise typer.Exit(code)
+
+
+@app.command(name="verify")
+def verify_cmd(
+    dest: DestOpt = Path("/dest"),
+    catalog_mode: ModeOpt = "native",
+    work_dir: WorkOpt = None,
+) -> None:
+    """Re-hash every copied file against the catalog."""
+    cat = open_catalog(dest, catalog_mode, work_dir)
+    try:
+        res = verify(cat, dest, cat.clock())
+    finally:
+        cat.close()
+    typer.echo(
+        f"Checked {res.checked}; missing {res.missing}; corrupt {res.corrupt}; "
+        f"not in catalog {res.orphans}; leftover temp files removed {res.tmp_removed}"
+    )
+    if not res.ok:
+        raise typer.Exit(1)
+
+
+@app.command(name="retry-errors")
+def retry_errors(
+    label: str,
+    dest: DestOpt = Path("/dest"),
+    catalog_mode: ModeOpt = "native",
+    work_dir: WorkOpt = None,
+) -> None:
+    """Re-attempt files that failed to read."""
+    cat = open_catalog(dest, catalog_mode, work_dir)
+    try:
+        sid, _ = _source(cat, label)
+        with cat.lock:
+            cur = cat.conn.execute(
+                "UPDATE files SET status='seen', error=NULL, hash=NULL"
+                " WHERE source_id=? AND status='error' AND size IS NOT NULL",
+                (sid,),
+            )
+            cat.commit()
+    finally:
+        cat.close()
+    typer.echo(f"{cur.rowcount} files queued; run `run {label}` to process them.")
+
+
+@report_app.command("errors")
+def report_errors(
+    dest: DestOpt = Path("/dest"),
+    catalog_mode: ModeOpt = "native",
+    work_dir: WorkOpt = None,
+) -> None:
+    """Files that failed to read."""
+    cat = open_catalog(dest, catalog_mode, work_dir)
+    try:
+        rows = cat.conn.execute(
+            "SELECT s.label, f.rel_path, f.error FROM files f JOIN sources s ON s.id=f.source_id"
+            " WHERE f.status='error' ORDER BY s.label, f.rel_path"
+        ).fetchall()
+    finally:
+        cat.close()
+    if not rows:
+        typer.echo("No errors.")
+    for label, path, err in rows:
+        typer.echo(f"{label}: {path}: {err}")
