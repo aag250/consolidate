@@ -1,0 +1,60 @@
+[tool.poetry]
+name = "drivecon"
+version = "0.1.0"
+description = "Consolidate old drives into one deduplicated, browsable NTFS backup."
+authors = ["Anthony Giardina"]
+readme = "README.md"
+packages = [{ include = "drivecon", from = "src" }]
+
+[tool.poetry.dependencies]
+python = ">=3.12,<3.13"
+blake3 = "*"
+python-magic = "*"
+Pillow = "*"
+exifread = "*"
+typer = "*"
+rich = "*"
+tomlkit = "*"
+pyyaml = "*"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "*"
+pytest-cov = "*"
+pytest-timeout = "*"
+pytest-xdist = "*"
+hypothesis = "*"
+pexpect = "*"
+syrupy = "*"
+ruff = "*"
+mypy = "*"
+types-pyyaml = "*"
+
+[tool.poetry.scripts]
+drivecon = "drivecon.cli:app"
+
+[build-system]
+requires = ["poetry-core>=1.9"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "SIM"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+files = ["src", "tests"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+timeout = 120
+markers = [
+  "unit: pure functions, no I/O",
+  "component: one subsystem with real SQLite and temp dirs",
+  "system: CLI end to end against mock devices",
+  "container: builds and runs the Docker image",
+]

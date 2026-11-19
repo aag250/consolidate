@@ -1,0 +1,8 @@
+# Synthetic USB stick holding a backup copy of xp_era files.
+seed: 1
+files:
+  - path: "Backup 2012/finance/taxes/2011/w2.pdf"
+    key: w2
+    size: 200
+  - path: "Backup 2012/notes/todo.txt"
+    content: "synthetic note"

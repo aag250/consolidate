@@ -1,0 +1,14 @@
+# Synthetic XP-era Windows drive. All names are generic.
+seed: 1
+files:
+  - path: "Documents and Settings/user1/My Documents/finance/taxes/2011/w2.pdf"
+    key: w2
+    size: 200
+  - path: "Documents and Settings/user1/My Documents/notes/todo.txt"
+    content: "synthetic note"
+  - path: "Documents and Settings/user1/Local Settings/Application Data/app/cache.tmp"
+    size: 10
+  - path: "Windows/System32/driver.dll"
+    size: 10
+  - path: "Documents and Settings/user1/Desktop/Thumbs.db"
+    size: 5

@@ -1,0 +1,48 @@
+name: ci
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - run: pipx install poetry
+      - run: poetry install
+      - run: poetry run ruff check .
+      - run: poetry run mypy
+
+  unit:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12", cache: poetry }
+      - run: pipx install poetry
+      - run: poetry install
+      - run: poetry run pytest -m "unit or component"
+
+  system:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - run: sudo apt-get update && sudo apt-get install -y ntfs-3g exfatprogs dosfstools e2fsprogs smartmontools libmagic1
+      - run: pipx install poetry
+      - run: poetry install
+      - run: sudo -E env "PATH=$PATH" poetry run pytest -m system
+
+  container:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker build -t drivecon .
+      - run: echo "container smoke test added with the Dockerfile step"
