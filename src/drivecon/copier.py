@@ -64,7 +64,9 @@ def _fsync_dir(path: Path) -> None:
         os.close(fd)
 
 
-def copy_blob(src: Path, final: Path, expected: str, mtime: float) -> None:
+def copy_blob(
+    src: Path, final: Path, expected: str, mtime: float, fault_prefix: str = "copy"
+) -> None:
     """Copy ``src`` to ``final`` safely. A crash never leaves a half-written file under
     its final name."""
     final.parent.mkdir(parents=True, exist_ok=True)
@@ -75,17 +77,17 @@ def copy_blob(src: Path, final: Path, expected: str, mtime: float) -> None:
             while chunk := fin.read(CHUNK):
                 h.update(chunk)
                 fout.write(chunk)
-            fault.checkpoint("copy.after_temp_write")
+            fault.checkpoint(f"{fault_prefix}.after_temp_write")
             fout.flush()
             os.fsync(fout.fileno())
-        fault.checkpoint("copy.after_fsync")
+        fault.checkpoint(f"{fault_prefix}.after_fsync")
         if h.hexdigest() != expected:
             raise SourceChanged(str(src))
         if hash_file(tmp)[0] != expected:
             raise OSError(errno.EIO, "re-hash of the copy does not match", str(tmp))
         os.utime(tmp, (mtime, mtime))
         os.replace(tmp, final)
-        fault.checkpoint("copy.after_rename")
+        fault.checkpoint(f"{fault_prefix}.after_rename")
         _fsync_dir(final.parent)
     except OSError as e:
         if e.errno == errno.ENOSPC:

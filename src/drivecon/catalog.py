@@ -89,6 +89,21 @@ CREATE TABLE IF NOT EXISTS excluded_dirs (
     file_count INTEGER NOT NULL DEFAULT 0, total_bytes INTEGER NOT NULL DEFAULT 0
 );
 
+CREATE TABLE IF NOT EXISTS mirrors (
+    id INTEGER PRIMARY KEY,
+    label TEXT NOT NULL UNIQUE,
+    volume_serial TEXT NOT NULL UNIQUE,
+    registered_at TEXT NOT NULL,
+    last_sync_at TEXT
+);
+
+CREATE TABLE IF NOT EXISTS mirror_blobs (
+    mirror_id INTEGER NOT NULL REFERENCES mirrors(id),
+    hash TEXT NOT NULL,
+    synced_at TEXT NOT NULL,
+    PRIMARY KEY (mirror_id, hash)
+);
+
 CREATE TABLE IF NOT EXISTS runs (
     id INTEGER PRIMARY KEY,
     command TEXT NOT NULL, source_id INTEGER REFERENCES sources(id),

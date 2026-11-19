@@ -14,6 +14,14 @@ from drivecon.config import load_file_types, load_path_rules
 from drivecon.copier import CopyStats, DestinationFull, copy_source, verify
 from drivecon.hashing import HashStats, HashWorker
 from drivecon.intake import append_results, human, run_intake, synthetic_device
+from drivecon.mirror import (
+    MirrorError,
+    behind,
+    open_mirror,
+    register_mirror,
+    sync_mirror,
+    verify_mirror,
+)
 from drivecon.pending import PendingInfo, PendingTracker, release_decided
 from drivecon.photos import exif_date
 from drivecon.placement import Placer
@@ -95,6 +103,7 @@ def intake(
             raise typer.Exit(3)
 
 
+MirrorOpt = Annotated[Path, typer.Option(envvar="DRIVECON_MIRROR", help="Secondary drive.")]
 ConfigOpt = Annotated[Path, typer.Option(envvar="DRIVECON_CONFIG", help="Folder with the TOMLs.")]
 SourcesOpt = Annotated[Path, typer.Option(envvar="DRIVECON_SOURCES", help="Folder of sources.")]
 OsOpt = Annotated[str, typer.Option("--os", help="windows, linux or auto (from fs type).")]
@@ -284,6 +293,11 @@ def _copy_phase(
     )  # fmt: skip
 
 
+def _mirror_lag(cat: Catalog) -> list[tuple[str, int, int]]:
+    rows = cat.conn.execute("SELECT id, label FROM mirrors ORDER BY label").fetchall()
+    return [(label, *behind(cat, mid)) for mid, label in rows]
+
+
 def _record_results(cat: Catalog, sid: int, dest: Path) -> None:
     """Append this drive's results to its intake sheet and refresh _reports/."""
     summary = summarize(cat, sid)
@@ -291,6 +305,11 @@ def _record_results(cat: Catalog, sid: int, dest: Path) -> None:
     if sheet.exists():
         append_results(sheet, results_block(summary, dt.date.today()))
     write_reports(cat, dest)
+    for label, files, size in _mirror_lag(cat):
+        if files:
+            typer.echo(
+                f"Secondary {label} is {files} files ({human(size)}) behind: run sync-mirror"
+            )
     verdict = "safe to retire" if summary.retire_safe else "NOT safe to retire yet"
     typer.echo(f"{summary.label}: {verdict}")
     for r in summary.reasons:
@@ -407,18 +426,28 @@ def run(
 @app.command(name="verify")
 def verify_cmd(
     dest: DestOpt = Path("/dest"),
+    mirror: Annotated[bool, typer.Option("--mirror", help="Verify the secondary drive.")] = False,
+    mirror_root: MirrorOpt = Path("/mirror"),
     catalog_mode: ModeOpt = "native",
     work_dir: WorkOpt = None,
 ) -> None:
     """Re-hash every copied file against the catalog."""
     cat = open_catalog(dest, catalog_mode, work_dir)
     try:
-        res = verify(cat, dest, cat.clock())
+        if mirror:
+            try:
+                res = verify_mirror(cat, open_mirror(cat, mirror_root), cat.clock())
+            except MirrorError as e:
+                typer.echo(str(e), err=True)
+                raise typer.Exit(2) from e
+        else:
+            res = verify(cat, dest, cat.clock())
     finally:
         cat.close()
     typer.echo(
         f"Checked {res.checked}; missing {res.missing}; corrupt {res.corrupt}; "
-        f"not in catalog {res.orphans}; leftover temp files removed {res.tmp_removed}"
+        f"{'extra on secondary' if mirror else 'not in catalog'} {res.orphans}; "
+        f"leftover temp files removed {res.tmp_removed}"
     )
     if not res.ok:
         raise typer.Exit(1)
@@ -478,9 +507,14 @@ def report_sources(
     cat = open_catalog(dest, catalog_mode, work_dir)
     try:
         rows = summarize_all(cat)
+        lag = _mirror_lag(cat)
+        last = dict(cat.conn.execute("SELECT label, last_sync_at FROM mirrors"))
     finally:
         cat.close()
     typer.echo(sources_table(rows) if rows else "No sources registered.")
+    for label, files, size in lag:
+        state = "up to date" if not files else f"{files} files ({human(size)}) behind"
+        typer.echo(f"Secondary {label}: {state}; last sync {last.get(label) or 'never'}")
 
 
 @report_app.command("conflicts")
@@ -537,3 +571,84 @@ def where_cmd(
         raise typer.Exit(1)
     for label, rel, status, dest_path in rows:
         typer.echo(f"{label}: {rel}  [{status}]  -> {dest_path}")
+
+
+mirror_app = typer.Typer(help="Secondary drive.")
+app.add_typer(mirror_app, name="mirror")
+
+
+@mirror_app.command("register")
+def mirror_register(
+    label: str,
+    serial: Annotated[str, typer.Option(help="NTFS volume serial, e.g. from `blkid`.")],
+    dest: DestOpt = Path("/dest"),
+    mirror_root: MirrorOpt = Path("/mirror"),
+    catalog_mode: ModeOpt = "native",
+    work_dir: WorkOpt = None,
+) -> None:
+    """Register the secondary drive once, by its volume serial."""
+    cat = open_catalog(dest, catalog_mode, work_dir)
+    try:
+        m = register_mirror(cat, mirror_root, label, serial)
+    except MirrorError as e:
+        typer.echo(str(e), err=True)
+        raise typer.Exit(2) from e
+    finally:
+        cat.close()
+    typer.echo(f"Registered secondary {m.label} ({m.serial}).")
+
+
+@app.command(name="sync-mirror")
+def sync_mirror_cmd(
+    prune: Annotated[
+        bool, typer.Option(help="Remove files the catalog no longer expects.")
+    ] = False,
+    yes: Annotated[bool, typer.Option(help="Do not ask before pruning.")] = False,
+    dest: DestOpt = Path("/dest"),
+    mirror_root: MirrorOpt = Path("/mirror"),
+    catalog_mode: ModeOpt = "native",
+    work_dir: WorkOpt = None,
+) -> None:
+    """Copy everything new on the primary to the secondary, verifying each file."""
+    cat = open_catalog(dest, catalog_mode, work_dir)
+    code = 0
+
+    def confirm(extras: list[str]) -> bool:
+        typer.echo(f"{len(extras)} files on the secondary are not in the catalog:")
+        for e in extras[:20]:
+            typer.echo(f"  {e}")
+        return yes or typer.confirm("Remove them from the secondary?", default=False)
+
+    try:
+        mirror = open_mirror(cat, mirror_root)
+        _, every = _test_hooks()
+        batch = _batches()[2]
+        stats = sync_mirror(
+            cat, dest, mirror, progress=lambda s: typer.echo(f"[sync] {s.copied} copied"),
+            progress_every=every, batch=batch, prune=confirm if prune else None,
+        )  # fmt: skip
+        typer.echo(
+            f"Synced {stats.copied} files ({human(stats.bytes)}) to {mirror.label}; "
+            f"{stats.small_files} sheets/reports updated; pruned {stats.pruned}"
+        )
+        if stats.extras:
+            typer.echo(
+                f"{len(stats.extras)} extra files on the secondary were left alone "
+                "(see _reports/mirror-extra.csv; remove with --prune)."
+            )
+        for e in stats.errors:
+            typer.echo(f"ERROR: {e}", err=True)
+        code = 1 if stats.errors else 0
+    except MirrorError as e:
+        typer.echo(str(e), err=True)
+        code = 2
+    except DestinationFull:
+        typer.echo("The secondary is full. Free some space and re-run.", err=True)
+        code = 4
+    except KeyboardInterrupt:
+        typer.echo("Interrupted; re-run to continue.", err=True)
+        code = 130
+    finally:
+        cat.close()
+    if code:
+        raise typer.Exit(code)
