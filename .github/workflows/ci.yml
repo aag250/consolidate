@@ -35,7 +35,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with: { python-version: "3.12" }
-      - run: sudo apt-get update && sudo apt-get install -y ntfs-3g exfatprogs dosfstools e2fsprogs smartmontools libmagic1
+      - run: sudo apt-get update && sudo apt-get install -y ntfs-3g exfatprogs exfat-fuse dosfstools e2fsprogs smartmontools libmagic1 fdisk dmsetup fuse3
       - run: pipx install poetry
       - run: poetry install
       - run: sudo -E env "PATH=$PATH" poetry run pytest -m system

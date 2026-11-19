@@ -35,22 +35,36 @@ mkdir -p "$SRV/intake" "$SRV/sources/$label"
 
 lsblk --json -b -o NAME,MODEL,SERIAL,SIZE,TRAN,FSTYPE,UUID,LABEL "$device" > "$work/lsblk.json"
 
-if [ -z "$partition" ]; then
-  partition=$(python3 - "$work/lsblk.json" "$device" <<'PY'
-import json, sys
-disk = json.load(open(sys.argv[1]))["blockdevices"][0]
-if disk.get("fstype"):
-    print(sys.argv[2])
-else:
-    for c in disk.get("children", []):
-        if c.get("fstype"):
-            print("/dev/" + c["name"]); break
+# lsblk reads filesystem types from the udev database, which may be missing (containers,
+# minimal hosts), so fall back to probing the device itself with blkid -p.
+python3 - "$work/lsblk.json" "$device" "${partition:-}" > "$work/partition.txt" <<'PY'
+import json, subprocess, sys
+path, device, wanted = sys.argv[1:4]
+data = json.load(open(path))
+disk = data["blockdevices"][0]
+
+def probe(dev):
+    r = subprocess.run(["blkid", "-p", "-o", "value", "-s", "TYPE", dev],
+                       capture_output=True, text=True)
+    return r.stdout.strip() if r.returncode == 0 else ""
+
+for node in [disk, *disk.get("children", [])]:
+    dev = device if node is disk else "/dev/" + node["name"]
+    if not node.get("fstype"):
+        node["fstype"] = probe(dev) or None
+json.dump(data, open(path, "w"))
+chosen = wanted
+if not chosen:
+    if disk.get("fstype"):
+        chosen = device
+    else:
+        chosen = next(("/dev/" + c["name"] for c in disk.get("children", []) if c.get("fstype")), "")
+print(chosen)
 PY
-)
-fi
+partition=$(cat "$work/partition.txt")
 [ -n "$partition" ] || { echo "no partition with a filesystem found on $device" >&2; exit 1; }
 
-blkid -o export "$partition" > "$work/blkid.env" || true
+blkid -p -o export "$partition" > "$work/blkid.env" || true
 
 if [ -n "$smart_file" ]; then
   cp "$smart_file" "$work/smart.json"

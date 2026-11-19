@@ -24,7 +24,12 @@ def setup(tmp_path: Path, mount_opts: str = "ro,relatime") -> tuple[Path, dict[s
     lsblk = json.loads((FIX / "device_healthy_usb.json").read_text())["lsblk"]
     (tmp_path / "lsblk.json").write_text(json.dumps(lsblk))
     stub(b, "lsblk", f"cat {tmp_path}/lsblk.json")
-    stub(b, "blkid", "printf 'UUID=1A2B3C4D5E6F7788\\nTYPE=ntfs\\nLABEL=OS\\n'")
+    stub(
+        b,
+        "blkid",
+        'case "${@: -1}" in /dev/sdb1)'
+        ' printf "UUID=1A2B3C4D5E6F7788\\nTYPE=ntfs\\nLABEL=OS\\n";; *) exit 2;; esac',
+    )
     stub(b, "smartctl", f"cat {FIX}/smart/healthy.json")
     stub(
         b,

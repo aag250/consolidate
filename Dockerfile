@@ -8,6 +8,11 @@ COPY pyproject.toml poetry.lock* README.md ./
 COPY src ./src
 
 FROM base AS dev
+# Tools for the image-mock system tests (loop devices, mkfs, FUSE drivers, device-mapper).
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ntfs-3g exfatprogs exfat-fuse dosfstools e2fsprogs util-linux mount dmsetup fuse3 \
+    smartmontools procps fdisk \
+    && rm -rf /var/lib/apt/lists/*
 RUN poetry install
 WORKDIR /app
 CMD ["bash"]
