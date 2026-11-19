@@ -1,0 +1,53 @@
+{
+ "smartctl": {
+  "exit_status": 0
+ },
+ "device": {
+  "protocol": "ATA",
+  "type": "sat"
+ },
+ "model_name": "SYNTH-DISK-1",
+ "serial_number": "SN0000",
+ "user_capacity": {
+  "bytes": 500107862016
+ },
+ "smart_support": {
+  "available": true,
+  "enabled": true
+ },
+ "smart_status": {
+  "passed": true
+ },
+ "ata_smart_attributes": {
+  "table": [
+   {
+    "id": 5,
+    "name": "Reallocated_Sector_Ct",
+    "raw": {
+     "value": 0
+    }
+   },
+   {
+    "id": 9,
+    "name": "Power_On_Hours",
+    "raw": {
+     "value": 12345
+    }
+   },
+   {
+    "id": 197,
+    "name": "Current_Pending_Sector",
+    "raw": {
+     "value": 2
+    }
+   },
+   {
+    "id": 198,
+    "name": "Offline_Uncorrectable",
+    "raw": {
+     "value": 0
+    }
+   }
+  ]
+ }
+}

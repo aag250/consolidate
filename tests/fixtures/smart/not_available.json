@@ -1,0 +1,8 @@
+{
+ "smartctl": {
+  "exit_status": 4
+ },
+ "smart_support": {
+  "available": false
+ }
+}

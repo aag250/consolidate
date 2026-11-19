@@ -1,0 +1,11 @@
+{
+ "smartctl": {
+  "exit_status": 4,
+  "messages": [
+   {
+    "string": "Unknown USB bridge [0x0000:0x0000 (0x100)]",
+    "severity": "error"
+   }
+  ]
+ }
+}

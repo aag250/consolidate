@@ -1,0 +1,99 @@
+# serializer version: 1
+# name: test_sheet_snapshot_and_width[failed]
+  '''
+  ======================================================================
+   DRIVE        Dell-2009-C
+  ======================================================================
+   Intake date  2026-11-18
+   Model        SYNTH-DISK-1
+   Serial       SN0000
+   Capacity     500.1 GB
+   Used         123.5 GB
+   Interface    usb (sat)
+   Filesystem   ntfs
+   Volume label OS
+   UUID         1A2B3C4D5E6F7788
+   Partitions   sdb1 ntfs 500.1 GB
+  ----------------------------------------------------------------------
+   SMART        FAILED
+                realloc 0  pending 0  offline 0
+   ** WARNING   Overall SMART result is FAILED
+  ----------------------------------------------------------------------
+   RESULTS (appended after each run)
+  ----------------------------------------------------------------------
+  
+  '''
+# ---
+# name: test_sheet_snapshot_and_width[healthy]
+  '''
+  ======================================================================
+   DRIVE        Dell-2009-C
+  ======================================================================
+   Intake date  2026-11-18
+   Model        SYNTH-DISK-1
+   Serial       SN0000
+   Capacity     500.1 GB
+   Used         123.5 GB
+   Interface    usb (sat)
+   Filesystem   ntfs
+   Volume label OS
+   UUID         1A2B3C4D5E6F7788
+   Partitions   sdb1 ntfs 500.1 GB
+  ----------------------------------------------------------------------
+   SMART        PASSED
+                realloc 0  pending 0  offline 0
+  ----------------------------------------------------------------------
+   RESULTS (appended after each run)
+  ----------------------------------------------------------------------
+  
+  '''
+# ---
+# name: test_sheet_snapshot_and_width[reallocated]
+  '''
+  ======================================================================
+   DRIVE        Dell-2009-C
+  ======================================================================
+   Intake date  2026-11-18
+   Model        SYNTH-DISK-1
+   Serial       SN0000
+   Capacity     500.1 GB
+   Used         123.5 GB
+   Interface    usb (sat)
+   Filesystem   ntfs
+   Volume label OS
+   UUID         1A2B3C4D5E6F7788
+   Partitions   sdb1 ntfs 500.1 GB
+  ----------------------------------------------------------------------
+   SMART        PASSED
+                realloc 8  pending 0  offline 0
+   ** WARNING   reallocated sectors: 8
+  ----------------------------------------------------------------------
+   RESULTS (appended after each run)
+  ----------------------------------------------------------------------
+  
+  '''
+# ---
+# name: test_sheet_snapshot_and_width[usb_bridge_no_smart]
+  '''
+  ======================================================================
+   DRIVE        Dell-2009-C
+  ======================================================================
+   Intake date  2026-11-18
+   Model        SYNTH-DISK-1
+   Serial       SN0000
+   Capacity     500.1 GB
+   Used         123.5 GB
+   Interface    usb
+   Filesystem   ntfs
+   Volume label OS
+   UUID         1A2B3C4D5E6F7788
+   Partitions   sdb1 ntfs 500.1 GB
+  ----------------------------------------------------------------------
+   SMART        not available
+                Unknown USB bridge [0x0000:0x0000 (0x100)]
+  ----------------------------------------------------------------------
+   RESULTS (appended after each run)
+  ----------------------------------------------------------------------
+  
+  '''
+# ---
