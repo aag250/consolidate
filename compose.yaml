@@ -1,11 +1,65 @@
+# Runtime: one unprivileged container. The host mounts drives and hands the container
+# read-only source folders; the container writes only to /dest (and /config, /mirror).
+#
+#   docker compose run --rm drivecon run Dell-2009-C
+#   docker compose run --rm drivecon-mirror sync-mirror
+#
+# Set DRIVECON_UID/GID to the owner of the mounted NTFS destination (id -u / id -g).
+
+x-drivecon: &drivecon
+  build: { context: ., target: runtime }
+  image: drivecon
+  user: "${DRIVECON_UID:-1000}:${DRIVECON_GID:-1000}"
+  working_dir: /tmp
+  environment:
+    DRIVECON_DEST: /dest
+    DRIVECON_CONFIG: /config
+    DRIVECON_SOURCES: /sources
+    DRIVECON_MIRROR: /mirror
+    DRIVECON_CATALOG_MODE: "${DRIVECON_CATALOG_MODE:-native}"   # wsl when the destination is /mnt/<letter>
+    DRIVECON_WORK_DIR: /work
+  volumes:
+    - type: bind                        # sources are read-only twice: host ro mount, and :ro here
+      source: "${DRIVECON_SRV:-/srv}/sources"
+      target: /sources
+      read_only: true
+      bind: { propagation: rslave }     # sees drives the host mounts after the container starts
+    - { type: bind, source: "${DRIVECON_DEST_DIR:-/mnt/dest}", target: /dest }
+    - { type: bind, source: "./config", target: /config }
+    - { type: bind, source: "${DRIVECON_SRV:-/srv}/intake", target: /intake, read_only: true }
+    - { type: volume, source: catalog-work, target: /work }   # WSL2 catalog working copy
+
 services:
+  drivecon:
+    <<: *drivecon
+
+  # Same, plus the secondary drive, for sync-mirror, verify --mirror and mirror register.
+  drivecon-mirror:
+    <<: *drivecon
+    volumes:
+      - type: bind
+        source: "${DRIVECON_SRV:-/srv}/sources"
+        target: /sources
+        read_only: true
+        bind: { propagation: rslave }
+      - { type: bind, source: "${DRIVECON_DEST_DIR:-/mnt/dest}", target: /dest }
+      - { type: bind, source: "${DRIVECON_MIRROR_DIR:-/mnt/mirror}", target: /mirror }
+      - { type: bind, source: "./config", target: /config }
+      - { type: bind, source: "${DRIVECON_SRV:-/srv}/intake", target: /intake, read_only: true }
+      - { type: volume, source: catalog-work, target: /work }
+
+  # Development: tests, lint and type checks run here.
   dev:
     build: { context: ., target: dev }
     volumes: [".:/app"]
     working_dir: /app
+
   # Same image, privileged: loop devices and mounts for the image-mock system tests.
   dev-root:
     build: { context: ., target: dev }
     volumes: [".:/app"]
     working_dir: /app
     privileged: true
+
+volumes:
+  catalog-work: {}

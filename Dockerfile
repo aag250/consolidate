@@ -18,7 +18,9 @@ WORKDIR /app
 CMD ["bash"]
 
 FROM base AS runtime
+# libmagic1 (in base) sniffs extension-less files; exiftool is optional and unused for now.
 RUN poetry install --only main \
-    && useradd --create-home drivecon
+    && useradd --create-home --uid 1000 drivecon
 USER drivecon
+ENV HOME=/home/drivecon
 ENTRYPOINT ["drivecon"]
