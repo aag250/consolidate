@@ -44,10 +44,19 @@ class Junk:
 
 
 @dataclass(frozen=True)
+class PhotoRules:
+    extensions: tuple[str, ...] = ()
+    camera_folders: tuple[str, ...] = ()
+    camera_folder_regex: str = r"$^"
+
+
+@dataclass(frozen=True)
 class PathRules:
     exclusions: tuple[Exclusion, ...]
     exceptions: tuple[str, ...]
     junk: Junk
+    strip_prefixes: tuple[str, ...] = ()
+    photos: PhotoRules = PhotoRules()
 
 
 def load_file_types(path: Path) -> FileTypes:
@@ -91,7 +100,15 @@ def load_path_rules(path: Path) -> PathRules:
         min_image_bytes=int(j["min_image_bytes"]),
         image_extensions=tuple(str(e).lower() for e in j["image_extensions"]),
     )
-    return PathRules(exclusions, exceptions, junk)
+    merge = doc.get("merge", {})
+    ph = doc.get("photos", {})
+    photos = PhotoRules(
+        extensions=tuple(str(e).lower() for e in ph.get("extensions", [])),
+        camera_folders=tuple(str(f) for f in ph.get("camera_folders", [])),
+        camera_folder_regex=str(ph.get("camera_folder_regex", r"$^")),
+    )
+    prefixes = tuple(str(p) for p in merge.get("strip_prefixes", []))
+    return PathRules(exclusions, exceptions, junk, prefixes, photos)
 
 
 def record_decision(path: Path, ext: str, decision: str, example: str, today: dt.date) -> None:

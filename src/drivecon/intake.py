@@ -5,6 +5,7 @@ from __future__ import annotations
 import datetime as dt
 import json
 import shutil
+from collections.abc import Sequence
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
@@ -39,6 +40,8 @@ def parse_device_info(data: dict[str, Any]) -> DeviceInfo:
         for c in disk.get("children", [])
     )
     iface = disk.get("tran") or ""
+    if str(disk.get("name", "")).startswith("mmcblk"):
+        iface = "sd"
     stype = smart.get("device", {}).get("type", "")
     if iface and stype and stype != "scsi":
         iface = f"{iface} ({stype})"
@@ -121,6 +124,7 @@ def run_intake(
     dest: Path,
     catalog: Catalog,
     today: dt.date,
+    strip_prefixes: Sequence[str] = (),
 ) -> IntakeResult:
     """Register the source, write ``_intake/<label>.txt`` and the raw JSON beside it."""
     info = parse_device_info(device_data)
@@ -143,6 +147,7 @@ def run_intake(
         used_bytes=info.used_bytes,
         smart_status=smart.status,
         smart_json=json.dumps(device_data.get("smart")),
+        strip_prefixes=json.dumps(list(strip_prefixes)),
     )
     row = catalog.conn.execute("SELECT label FROM sources WHERE id=?", (source_id,)).fetchone()
     label = row[0]  # a rescanned drive keeps the label it was first given

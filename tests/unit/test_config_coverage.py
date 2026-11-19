@@ -71,3 +71,20 @@ def test_every_junk_name_is_dropped() -> None:
     for pat in PR.junk.names:
         name = pat.replace("*", "x")
         assert rules.classify(f"docs/{name}", 8).action == "junk", pat
+
+
+@pytest.mark.unit
+def test_every_strip_prefix_strips_a_generated_example() -> None:
+    from drivecon.paths import strip_prefix
+
+    assert PR.strip_prefixes
+    for pat in PR.strip_prefixes:
+        example = pat.replace("*", "x").replace("[0-9]", "7").rstrip("/").split("/") + ["file.docx"]
+        assert strip_prefix(example, PR.strip_prefixes) == ["file.docx"], pat
+
+
+@pytest.mark.unit
+def test_every_photo_extension_is_an_include_type() -> None:
+    rules = Rules(FT, PR)
+    for ext in PR.photos.extensions:
+        assert rules.classify(f"DCIM/IMG_1.{ext}", 8).action == "include", ext

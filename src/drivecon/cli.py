@@ -47,6 +47,9 @@ def intake(
         Path | None, typer.Option(help="Use this smartctl JSON instead of the device's.")
     ] = None,
     yes: Annotated[bool, typer.Option(help="Continue past SMART warnings without asking.")] = False,
+    strip_prefix: Annotated[
+        list[str] | None, typer.Option(help="Extra folder prefix to strip, e.g. 'OldPC/'.")
+    ] = None,
     dest: DestOpt = Path("/dest"),
     catalog_mode: ModeOpt = "native",
     work_dir: WorkOpt = None,
@@ -61,7 +64,7 @@ def intake(
         data["smart"] = json.loads(smart_json.read_text())
     cat = open_catalog(dest, catalog_mode, work_dir)
     try:
-        result = run_intake(label, data, dest, cat, dt.date.today())
+        result = run_intake(label, data, dest, cat, dt.date.today(), strip_prefix or ())
     finally:
         cat.close()
     if result.already_known:

@@ -60,3 +60,28 @@ zero_byte = true
 # Image size floor: 0 = off. Set e.g. 10240 to drop icons below 10 KB.
 min_image_bytes = 0
 image_extensions = ["jpg", "jpeg", "png", "gif", "bmp", "tif", "tiff", "heic", "heif", "webp"]
+
+# Merging folder trees across drives. Each source path is stripped of the first matching
+# prefix below, repeatedly, so these two map to the same place:
+#   Users/joe/Documents/finance/w2.pdf  and  Backup 2012/finance/w2.pdf -> finance/w2.pdf
+# Extra prefixes per drive can be given at intake (--strip-prefix). First match wins,
+# so list the more specific patterns first. "*" matches one folder name.
+[merge]
+strip_prefixes = [
+  "Users/*/Documents/",
+  "Users/*/",
+  "Documents and Settings/*/My Documents/",
+  "Documents and Settings/*/",
+  "My Documents/",
+  "home/*/Documents/",
+  "home/*/",
+  "Backup/",
+  "Backup [0-9][0-9][0-9][0-9]/",
+]
+
+# Camera-dump images go to Files/Photos/YYYY/MM/ by EXIF date, else oldest modified time.
+[photos]
+extensions = ["jpg", "jpeg", "png", "gif", "bmp", "tif", "tiff", "heic", "heif", "webp",
+              "cr2", "cr3", "nef", "arw", "dng", "orf", "rw2", "raf", "pef", "srw"]
+camera_folders = ["DCIM", "Camera Roll"]
+camera_folder_regex = '^\d{3}[A-Za-z0-9_]{5}$'   # 100CANON, 100MEDIA, 101APPLE

@@ -68,6 +68,8 @@ CREATE TABLE IF NOT EXISTS blobs (
     copied_at TEXT, verified_at TEXT
 );
 
+CREATE INDEX IF NOT EXISTS blobs_dest_ci ON blobs (lower(dest_path));
+
 CREATE TABLE IF NOT EXISTS pending_extensions (
     ext TEXT PRIMARY KEY,
     first_seen TEXT, file_count INTEGER NOT NULL DEFAULT 0,
