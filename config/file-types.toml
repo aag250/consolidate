@@ -1,0 +1,172 @@
+# File type decisions. Extensions match case-insensitively.
+# Rules apply in order, first match wins: path exceptions, path exclusions,
+# junk-file rules (paths.toml), then these file types.
+# An extension on no list is held as pending_decision and prompted for; answers
+# are written to the [[decided]] tables at the bottom of this file.
+
+[[category]]
+name = "Word processing"
+decision = "include"
+extensions = ["doc", "docx", "docm", "dot", "dotx", "odt", "rtf", "wpd", "wps", "pages"]
+
+[[category]]
+name = "Spreadsheets"
+decision = "include"
+extensions = ["xls", "xlsx", "xlsm", "xlsb", "ods", "csv", "tsv", "numbers"]
+
+[[category]]
+name = "Presentations"
+decision = "include"
+extensions = ["ppt", "pptx", "pps", "ppsx", "odp", "key"]
+
+[[category]]
+name = "OneNote"
+decision = "include"
+extensions = ["one", "onetoc2", "onepkg"]
+notes = "Older OneNote notebooks often live in Documents/OneNote Notebooks/"
+
+[[category]]
+name = "Visio"
+decision = "include"
+extensions = ["vsd", "vsdx", "vsdm", "vss", "vssx", "vst", "vstx", "vdx"]
+notes = "Drawings, stencils and templates"
+
+[[category]]
+name = "Publisher and Project"
+decision = "include"
+extensions = ["pub", "mpp"]
+
+[[category]]
+name = "PDF and page formats"
+decision = "include"
+extensions = ["pdf", "xps", "oxps", "djvu"]
+notes = "Most scanner output lands here or in TIFF"
+
+[[category]]
+name = "Plain text and notes"
+decision = "include"
+extensions = ["txt", "md", "rst", "tex"]
+
+[[category]]
+name = "Photos and scans"
+decision = "include"
+extensions = ["jpg", "jpeg", "png", "gif", "bmp", "tif", "tiff", "heic", "heif", "webp"]
+notes = "Small images may be icons; see the image size floor in paths.toml"
+
+[[category]]
+name = "Camera RAW"
+decision = "include"
+extensions = ["cr2", "cr3", "nef", "arw", "dng", "orf", "rw2", "raf", "pef", "srw"]
+
+[[category]]
+name = "Contacts and calendars"
+decision = "include"
+extensions = ["vcf", "ics"]
+
+[[category]]
+name = "TurboTax"
+decision = "include"
+extensions = ["tax", "txf"]
+patterns = ['tax\d{2}', 'tax\d{4}']
+pattern_examples = ["tax08", "tax10", "tax2011", "tax2024"]
+notes = "Default save folder is Documents/TurboTax/, which is scanned"
+
+[[category]]
+name = "Other finance"
+decision = "include"
+extensions = ["qdf", "qbw", "qbb", "qif", "ofx", "qfx"]
+notes = "Quicken, QuickBooks, bank exports"
+
+[[category]]
+name = "E-books"
+decision = "include"
+extensions = ["epub", "mobi", "azw3"]
+
+[[category]]
+name = "Video"
+decision = "include"
+extensions = ["mp4", "mov", "avi", "mkv", "wmv", "m4v", "mpg", "mts", "m2ts", "3gp"]
+notes = "Could dominate the 1 TB estimate"
+
+[[category]]
+name = "Audio"
+decision = "include"
+extensions = ["mp3", "m4a", "wav", "flac", "wma", "ogg", "amr"]
+notes = "Voice memos and music libraries alike"
+
+[[category]]
+name = "Email archives"
+decision = "include"
+extensions = ["pst", "mbox", "eml", "msg"]
+notes = "PST files are rescued from AppData by the path exceptions"
+
+[[category]]
+name = "Graphics source files"
+decision = "include"
+extensions = ["psd", "xcf", "ai", "eps", "svg", "cdr"]
+
+[[category]]
+name = "Archives"
+decision = "include"
+extensions = ["zip", "7z", "rar", "tar", "gz", "tgz"]
+notes = "Copied whole; not opened"
+
+[[category]]
+name = "Databases"
+decision = "include"
+extensions = ["mdb", "accdb", "sqlite", "db"]
+notes = "Thumbs.db is still dropped by the junk rules"
+
+[[category]]
+name = "Saved web pages"
+decision = "include"
+extensions = ["htm", "html", "mht", "mhtml"]
+notes = "A saved page's _files/ folder is kept with it"
+
+[[category]]
+name = "CAD and engineering"
+decision = "include"
+extensions = ["dwg", "dxf", "step", "stp", "stl", "kicad_pcb", "sch"]
+patterns = ['s[1-4]p']
+pattern_examples = ["s1p", "s4p"]
+notes = "Includes Touchstone files (s1p-s4p)"
+
+[[category]]
+name = "Source code and notebooks"
+decision = "include"
+extensions = ["py", "c", "h", "cpp", "m", "ipynb", "sh", "ps1", "bas"]
+
+[[category]]
+name = "Config and structured data"
+decision = "exclude"
+extensions = ["json", "xml", "yaml", "yml", "ini", "cfg", "reg"]
+notes = "Overwhelmingly application config"
+
+[[category]]
+name = "Logs, temp and dumps"
+decision = "exclude"
+extensions = ["log", "tmp", "temp", "bak", "old", "dmp", "etl", "evtx"]
+notes = "bak can be a user's manual backup"
+
+[[category]]
+name = "Executables and libraries"
+decision = "exclude"
+extensions = ["exe", "dll", "sys", "msi", "msp", "cab", "drv", "ocx", "com", "scr", "so", "ko", "o", "a", "pyc", "class", "jar", "apk"]
+
+[[category]]
+name = "Shortcuts and system metadata"
+decision = "exclude"
+extensions = ["lnk", "url", "cat", "mui", "manifest", "inf", "pf"]
+
+[[category]]
+name = "Disk images and VMs"
+decision = "exclude"
+extensions = ["iso", "img", "vhd", "vhdx", "vmdk", "vdi", "wim"]
+notes = "May contain documents; out of scope for v1"
+
+[[category]]
+name = "Fonts"
+decision = "exclude"
+extensions = ["ttf", "otf", "fon", "fnt"]
+
+# Answers to unknown-extension prompts are appended below by `drivecon decide`.

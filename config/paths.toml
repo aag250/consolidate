@@ -1,0 +1,62 @@
+# Path rules. Patterns are matched case-insensitively against the path relative to
+# the source root, split on "/". A pattern matches a path (and everything under it)
+# when its segments match the path's leading segments. "*" matches within one
+# segment; a "**" segment matches any number of segments. A trailing "/" marks a
+# directory and is optional. "os" selects which kind of source the rule applies to
+# ("windows", "linux" or "any"); a Windows data drive with a top-level "Dev" folder
+# must not be hit by Linux system rules.
+
+[[exclusion]]
+scope = "Windows system"
+os = "windows"
+patterns = ["Windows/", "Program Files/", "Program Files (x86)/", "ProgramData/", "Recovery/", "MSOCache/", "Config.Msi/", "Intel/", "Drivers/", "$WINDOWS.~BT/", "Windows.old/Windows/"]
+non_examples = ["Windows.old/Users/u1/Documents/report.docx"]
+notes = "Windows.old/Users/ is still scanned"
+
+[[exclusion]]
+scope = "Windows per-user"
+os = "windows"
+patterns = ["Users/*/AppData/", "Documents and Settings/*/Application Data/", "Documents and Settings/*/Local Settings/"]
+non_examples = ["Users/u1/Documents/report.docx"]
+notes = "XP-era paths included"
+
+[[exclusion]]
+scope = "Windows housekeeping"
+os = "windows"
+patterns = ["$Recycle.Bin/", "RECYCLER/", "RECYCLED/", "System Volume Information/", "pagefile.sys", "hiberfil.sys", "swapfile.sys"]
+non_examples = ["Users/u1/Documents/recycler notes.docx"]
+notes = "Excluded by decision"
+
+[[exclusion]]
+scope = "Linux system"
+os = "linux"
+patterns = ["bin/", "boot/", "dev/", "etc/", "lib*/", "opt/", "proc/", "run/", "sbin/", "snap/", "sys/", "tmp/", "usr/", "var/", "**/lost+found/"]
+non_examples = ["home/u1/Documents/report.docx"]
+
+[[exclusion]]
+scope = "Linux per-user"
+os = "linux"
+patterns = ["home/*/.cache/", "home/*/.config/", "home/*/.local/share/Trash/", "home/*/.mozilla/", "home/*/.thunderbird/", "home/*/.wine/", "home/*/.steam/", "home/*/.npm/", "home/*/.cargo/", "home/*/.rustup/"]
+non_examples = ["home/u1/Documents/report.docx"]
+notes = ".thunderbird holds mail; flip if email is in scope"
+
+[[exclusion]]
+scope = "Anywhere"
+os = "any"
+patterns = ["**/node_modules/", "**/__pycache__/", "**/.venv/", "**/venv/", "**/.git/", "**/steamapps/", "**/.Trash-*/", "**/.Spotlight-V100/", "**/.fseventsd/"]
+non_examples = ["Documents/report.docx"]
+
+# Rescued even though they sit under an excluded path. Only used if the matching
+# file type is Include. Patterns must match the whole path.
+[[exception]]
+pattern = "Users/*/AppData/Local/Microsoft/Outlook/*.pst"
+
+[[exception]]
+pattern = "Documents and Settings/*/Local Settings/Application Data/Microsoft/Outlook/*.pst"
+
+[junk]
+names = ["Thumbs.db", "desktop.ini", ".DS_Store", "._*", "~$*", "~*.tmp"]
+zero_byte = true
+# Image size floor: 0 = off. Set e.g. 10240 to drop icons below 10 KB.
+min_image_bytes = 0
+image_extensions = ["jpg", "jpeg", "png", "gif", "bmp", "tif", "tiff", "heic", "heif", "webp"]
