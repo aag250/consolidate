@@ -2,6 +2,7 @@ import datetime as dt
 import errno
 import os
 import shutil
+import sys
 from pathlib import Path
 from typing import Any
 
@@ -24,6 +25,12 @@ from drivecon.pending import PendingTracker
 from drivecon.placement import Placer
 from drivecon.rules import Rules
 from drivecon.scan import Scanner
+
+pytestmark = pytest.mark.skipif(
+    sys.platform == "win32",
+    reason="needs POSIX: hostile names, statvfs or raw-byte paths cannot exist on Windows",
+)
+
 
 ROOT = Path(__file__).parent.parent.parent
 NOW = dt.datetime(2026, 11, 18, 12, 0, 0)

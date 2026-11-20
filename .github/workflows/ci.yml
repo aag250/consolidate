@@ -55,7 +55,8 @@ jobs:
       - name: System and image-mock tests (root, for loop devices)
         run: |
           set -o pipefail
-          sudo -E env "PATH=$PATH" poetry run pytest -m system 2>&1 | tee pytest.log
+          VENV=$(poetry env info --path)
+          sudo env "PATH=$VENV/bin:$PATH" python -m pytest -m system 2>&1 | tee pytest.log
       - name: Failure summary
         if: failure()
         run: python .github/summarize_failures.py pytest.log

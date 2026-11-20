@@ -1,6 +1,7 @@
 import datetime as dt
 import hashlib
 import sqlite3
+import sys
 from pathlib import Path
 
 import pytest
@@ -19,6 +20,12 @@ from drivecon.mirror import (
 )
 from drivecon.reports import write_reports
 from tests.component.test_pipeline import M1, M2, Lab
+
+pytestmark = pytest.mark.skipif(
+    sys.platform == "win32",
+    reason="needs POSIX: hostile names, statvfs or raw-byte paths cannot exist on Windows",
+)
+
 
 NOW = dt.datetime(2026, 11, 18, 12, 0, 0)
 

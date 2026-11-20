@@ -130,11 +130,8 @@ def _generation(path: Path) -> int:
 
 
 def _fsync_file(path: Path) -> None:
-    fd = os.open(path, os.O_RDONLY)
-    try:
-        os.fsync(fd)
-    finally:
-        os.close(fd)
+    with open(path, "r+b") as f:  # Windows can only fsync a descriptor opened for writing
+        os.fsync(f.fileno())
 
 
 def _atomic_copy_db(src: sqlite3.Connection, dest: Path, hook: str | None = None) -> None:

@@ -1,5 +1,6 @@
 import os
 import shutil
+import sys
 from pathlib import Path
 
 import pytest
@@ -7,6 +8,12 @@ from typer.testing import CliRunner
 
 from drivecon.cli import app
 from drivecon.mockdevices import build_tree
+
+pytestmark = pytest.mark.skipif(
+    sys.platform == "win32",
+    reason="needs POSIX: hostile names, statvfs or raw-byte paths cannot exist on Windows",
+)
+
 
 ROOT = Path(__file__).parent.parent.parent
 

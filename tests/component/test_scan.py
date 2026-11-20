@@ -2,6 +2,7 @@ import datetime as dt
 import os
 import shutil
 import sqlite3
+import sys
 from pathlib import Path
 from typing import Any
 
@@ -120,6 +121,7 @@ def test_resume_after_crash_between_batches_matches_uninterrupted_run(
 
 
 @pytest.mark.component
+@pytest.mark.skipif(sys.platform == "win32", reason="raw non-UTF-8 byte names are POSIX-only")
 def test_non_utf8_name_is_kept_as_raw_bytes(tmp_path: Path) -> None:
     e = Env(tmp_path, spec=None)
     with open(os.path.join(os.fsencode(e.root), b"caf\xe9.txt"), "wb") as f:
