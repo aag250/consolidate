@@ -4,48 +4,68 @@ on:
     branches: [main]
   pull_request:
 
+# Failure summaries are also written as annotations, so they are visible without log access.
+env:
+  PYTEST_ADDOPTS: "-q --tb=short -rfE -p no:cacheprovider"
+
 jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with: { python-version: "3.12" }
       - run: pipx install poetry
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12", cache: poetry }
       - run: poetry install
       - run: poetry run ruff check .
       - run: poetry run mypy
 
   unit:
     strategy:
+      fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest]
     runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        shell: bash
     steps:
       - uses: actions/checkout@v4
+      - run: pipx install poetry
       - uses: actions/setup-python@v5
         with: { python-version: "3.12", cache: poetry }
-      - run: pipx install poetry
       - run: poetry install
-      - run: poetry run pytest -m "unit or component"
+      - name: Unit and component tests
+        run: |
+          set -o pipefail
+          poetry run pytest -m "unit or component" 2>&1 | tee pytest.log
+      - name: Failure summary
+        if: failure()
+        run: python .github/summarize_failures.py pytest.log
 
   system:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with: { python-version: "3.12" }
       - run: sudo apt-get update && sudo apt-get install -y ntfs-3g exfatprogs exfat-fuse dosfstools e2fsprogs smartmontools libmagic1 fdisk dmsetup fuse3
       - run: pipx install poetry
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12", cache: poetry }
       - run: poetry install
-      - run: sudo -E env "PATH=$PATH" poetry run pytest -m system
+      - name: System and image-mock tests (root, for loop devices)
+        run: |
+          set -o pipefail
+          sudo -E env "PATH=$PATH" poetry run pytest -m system 2>&1 | tee pytest.log
+      - name: Failure summary
+        if: failure()
+        run: python .github/summarize_failures.py pytest.log
 
   container:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with: { python-version: "3.12" }
       - run: pipx install poetry
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12", cache: poetry }
       - run: poetry install
       - run: poetry run pytest -m container
