@@ -52,7 +52,7 @@ Files/                  merged document tree, original names
 Files/Photos/YYYY/MM/   camera-dump images, by EXIF date (else oldest modified time)
 _catalog/               catalog.sqlite + dated backups
 _intake/                one .txt sheet (and .json) per drive
-_reports/               conflicts, renamed paths, read errors
+_reports/               conflicts, renamed paths, likely versions, read errors
 ```
 
 **Merging trees.** Each source path is stripped to its meaningful part: drive letters,
@@ -71,6 +71,17 @@ drives never move a file that is already placed.
 **Name conflicts.** Two *different* files that map to the same path both stay. The later one
 gets its source and date added: `budget (Dell-2009-C, 2011-03-04).xlsx`. Comparison is
 case-insensitive, as NTFS is. Conflicts are listed in `_reports/conflicts.csv`.
+
+**Likely versions.** Files with the same name but different content are always both kept. When
+they also sit in the same or a similar folder, `report versions` (and `_reports/versions.csv`)
+suggests that one might be a newer version of the other, judged by modified date and size. Folders
+count as similar when they are the same, one is inside the other, they share a last folder name
+(`work/taxes`, `old-pc/taxes`), or they are siblings with near-identical names (`plan`,
+`plan-old`). Sibling folders like `taxes/2011` and `taxes/2012` do not, because those are
+different documents. It never claims more than the data shows: if the dates agree but the sizes
+differ it says it cannot tell which is newer, and if size and date agree but the content differs
+it flags possible corruption. Camera photos, which reuse names like `IMG_0001.jpg`, are left out.
+Nothing is moved or merged; this is only a hint for you to review.
 
 **NTFS-safe names.** Characters Windows forbids (`\ : * ? " < > |` and control characters)
 become `_`, trailing dots and spaces are trimmed, reserved names (`CON`, `NUL`, `COM1`...)
@@ -206,6 +217,7 @@ the secondary is needed). Paths inside the container are `/sources`, `/dest`, `/
 | `report types` | Unknown and pending extensions by count and size. |
 | `report errors` | Files that failed to read. |
 | `report conflicts` / `report renamed` | Same-path conflicts and NTFS name changes. |
+| `report versions` | Same-named files with different content in similar folders: which might be newer. |
 | `mirror register NAME --serial S` | Register the secondary drive. |
 | `sync-mirror [--prune] [--yes]` | Bring the secondary up to date. |
 | `verify --mirror` | Re-hash every file on the secondary against the catalog. |
@@ -389,6 +401,7 @@ src/drivecon/
   copier.py       copy + verify       mirror.py      secondary drive
   intake.py       intake sheet        smart.py       SMART assessment
   reports.py      results, where      photos.py      EXIF dates
+  versions.py     likely versions
   fault.py        crash points        mockdevices.py synthetic source trees
 scripts/intake.sh host-side intake helper
 config/           file-types.toml, paths.toml

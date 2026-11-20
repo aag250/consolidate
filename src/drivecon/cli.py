@@ -38,6 +38,7 @@ from drivecon.reports import (
 from drivecon.rules import Rules
 from drivecon.scan import Scanner, ScanStats
 from drivecon.session import apply_answer, ask_extension, run_scan_session
+from drivecon.versions import find_version_groups, has_newer_claim
 
 app = typer.Typer(help="Consolidate old drives into one deduplicated NTFS backup.")
 
@@ -332,6 +333,11 @@ def _record_results(cat: Catalog, sid: int, dest: Path) -> None:
             typer.echo(
                 f"Secondary {label} is {files} files ({human(size)}) behind: run sync-mirror"
             )
+    n_versions = len(find_version_groups(cat))
+    if n_versions:
+        typer.echo(
+            f"{n_versions} sets of files look like versions of one document: see `report versions`"
+        )
     verdict = "safe to retire" if summary.retire_safe else "NOT safe to retire yet"
     typer.echo(f"{summary.label}: {verdict}")
     for r in summary.reasons:
@@ -558,6 +564,30 @@ def report_conflicts(
         typer.echo("No conflicts.")
     for wanted, chosen, label, _h in rows:
         typer.echo(f"{wanted}  ->  {chosen}  [{label}]")
+
+
+@report_app.command("versions")
+def report_versions(
+    dest: DestOpt = Path("/dest"),
+    catalog_mode: ModeOpt = "native",
+    work_dir: WorkOpt = None,
+) -> None:
+    """Files with the same name in similar folders but different content: maybe versions."""
+    cat = open_catalog(dest, catalog_mode, work_dir)
+    try:
+        groups = find_version_groups(cat)
+    finally:
+        cat.close()
+    if not groups:
+        typer.echo("No likely versions found.")
+    for g in groups:
+        typer.echo(f"{g.name}: {len(g.members)} different files, newest first")
+        for i, m in enumerate(g.members):
+            day = dt.datetime.fromtimestamp(m.mtime, dt.UTC).date().isoformat()
+            tag = "  <- may be the newest" if i == 0 and has_newer_claim(g) else ""
+            typer.echo(f"  {m.dest_path}  {day}  {human(m.size)}  [{', '.join(m.drives)}]{tag}")
+        for note in g.notes:
+            typer.echo(f"  {note}")
 
 
 @report_app.command("renamed")

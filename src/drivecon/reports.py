@@ -11,6 +11,7 @@ from pathlib import Path
 
 from drivecon.catalog import Catalog
 from drivecon.intake import WIDTH, human
+from drivecon.versions import CSV_HEADER, csv_rows, find_version_groups
 
 HASH_RE = re.compile(r"^[0-9a-f]{64}$")
 
@@ -183,3 +184,4 @@ def write_reports(cat: Catalog, dest: Path) -> None:
         out / "renamed.csv", ["original_path", "destination_path", "hash"], renamed_rows(cat)
     )
     _write_csv(out / "errors.csv", ["drive", "path", "error"], error_rows(cat))
+    _write_csv(out / "versions.csv", CSV_HEADER, csv_rows(find_version_groups(cat)))
