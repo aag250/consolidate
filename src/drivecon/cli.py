@@ -64,7 +64,8 @@ def intake(
     label: Annotated[str, typer.Option(help="Label for this drive, e.g. Dell-2009-C.")],
     device_info: Annotated[Path | None, typer.Option(help="JSON collected by intake.sh.")] = None,
     source_dir: Annotated[
-        Path | None, typer.Option(hidden=True, help="Test only: register a directory mock.")
+        Path | None,
+        typer.Option(help="Register a mounted folder with no block device (SMB share)."),
     ] = None,
     smart_json: Annotated[
         Path | None, typer.Option(help="Use this smartctl JSON instead of the device's.")
@@ -142,6 +143,24 @@ def _batches() -> tuple[int, int, int]:
     return (n, n, n) if n else (1000, 100, 100)
 
 
+def ensure_read_only(root: Path) -> None:
+    """Refuse to touch a source that could be written to (sources are never modified)."""
+    if os.environ.get("DRIVECON_ALLOW_WRITABLE_SOURCES"):  # tests use plain directories
+        return
+    try:
+        read_only = bool(os.statvfs(root).f_flag & os.ST_RDONLY)
+    except OSError as e:
+        typer.echo(f"Cannot read source {root}: {e}", err=True)
+        raise typer.Exit(2) from e
+    if not read_only:
+        typer.echo(
+            f"Refusing to run: {root} is mounted read-write. Mount it read-only "
+            "(intake.sh does this) and bind it :ro.",
+            err=True,
+        )
+        raise typer.Exit(2)
+
+
 def _source(cat: Catalog, label: str) -> tuple[int, str | None]:
     row = cat.conn.execute("SELECT id, fs_type FROM sources WHERE label=?", (label,)).fetchone()
     if row is None:
@@ -171,6 +190,7 @@ def scan(
     cat = open_catalog(dest, catalog_mode, work_dir)
     try:
         sid, fs_type = _source(cat, label)
+        ensure_read_only(sources_root / label)
         rules = load_rules(config, os_kind, fs_type)
         throttle, every = _test_hooks()
         interactive = sys.stdin.isatty()
@@ -198,6 +218,7 @@ def dry_run(
     os_kind: OsOpt = "auto",
 ) -> None:
     """Scan and report what would be copied, writing nothing to Files/ or the real catalog."""
+    ensure_read_only(sources_root / label)
     with tempfile.TemporaryDirectory() as tmp:
         cat = Catalog(Path(tmp))
         try:
@@ -305,6 +326,7 @@ def _record_results(cat: Catalog, sid: int, dest: Path) -> None:
     if sheet.exists():
         append_results(sheet, results_block(summary, dt.date.today()))
     write_reports(cat, dest)
+    cat.backup_dated()  # a dated catalog copy after each drive
     for label, files, size in _mirror_lag(cat):
         if files:
             typer.echo(
@@ -335,6 +357,7 @@ def hash_cmd(
     cat = open_catalog(dest, catalog_mode, work_dir)
     try:
         sid, _ = _source(cat, label)
+        ensure_read_only(sources_root / label)
         throttle, every = _test_hooks()
         worker = HashWorker(cat, sid, sources_root / label, progress=_hash_progress,
                             progress_every=every, throttle=throttle,
@@ -360,6 +383,7 @@ def copy(
     code = 0
     try:
         sid, _ = _source(cat, label)
+        ensure_read_only(sources_root / label)
         stats = _copy_phase(cat, sid, sources_root / label, config, dest, threading.Event())
         _finish_copy(stats)
         _record_results(cat, sid, dest)
@@ -390,8 +414,9 @@ def run(
     code = 0
     try:
         sid, fs_type = _source(cat, label)
-        rules = load_rules(config, os_kind, fs_type)
         root = sources_root / label
+        ensure_read_only(root)
+        rules = load_rules(config, os_kind, fs_type)
         throttle, every = _test_hooks()
         scan_batch, hash_batch, _ = _batches()
         hasher = HashWorker(cat, sid, root, progress=_hash_progress, progress_every=every,

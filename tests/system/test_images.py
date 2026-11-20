@@ -37,8 +37,9 @@ class Env:
             f'exec {sys.executable} -m drivecon "${{args[@]}}"\n'
         )
         wrapper.chmod(0o755)
+        real_env = {k: v for k, v in os.environ.items() if k != "DRIVECON_ALLOW_WRITABLE_SOURCES"}
         self.env = {
-            **os.environ,
+            **real_env,
             "DRIVECON_SRV": str(self.srv),
             "DRIVECON_CMD": str(wrapper),
             "DRIVECON_DEST": str(dest),
@@ -202,6 +203,7 @@ def test_destination_fills_up_mid_copy_then_resumes(lab: Lab, tmp_path: Path) ->
         (src / "docs").mkdir(parents=True, exist_ok=True)
         (src / "docs" / f"f{i}.docx").write_bytes(os.urandom(1 << 20))
     e = Env(tmp_path, dest)
+    e.env["DRIVECON_ALLOW_WRITABLE_SOURCES"] = "1"  # a plain-directory source, not a mount
     assert e.cli("intake", "--label", "Big-1", "--source-dir", str(src)).returncode == 0
     first = e.cli("run", "Big-1")
     assert first.returncode == 4, first.stdout + first.stderr

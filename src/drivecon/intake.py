@@ -166,21 +166,21 @@ def append_results(sheet: Path, text: str) -> None:
 
 
 def synthetic_device(label: str, source_dir: Path) -> dict[str, Any]:
-    """Test-only device description for a directory mock."""
+    """Device description for a mounted folder with no block device (SMB share, mock)."""
     usage = shutil.disk_usage(source_dir)
     return {
         "lsblk": {
             "blockdevices": [
                 {
                     "name": label,
-                    "model": "MOCK",
+                    "model": "network/folder",
                     "serial": label,
                     "size": usage.total,
                     "tran": "dir",
                 }
             ]
         },
-        "blkid": {"UUID": f"mock-{label}", "TYPE": "dir", "LABEL": label},
+        "blkid": {"UUID": f"dir-{label}", "TYPE": "dir", "LABEL": label},
         "used_bytes": usage.used,
         "smart": None,
     }
