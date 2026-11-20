@@ -1,3 +1,4 @@
+import contextlib
 import datetime as dt
 import sqlite3
 from pathlib import Path
@@ -18,6 +19,14 @@ TABLES = {
     "runs",
     "meta",
 }
+
+
+def query(path: Path, sql: str) -> tuple[object, ...]:
+    """One row from another connection, closed at once (Windows cannot replace an open file)."""
+    with contextlib.closing(sqlite3.connect(path)) as conn:
+        row = conn.execute(sql).fetchone()
+        assert row is not None
+        return tuple(row)
 
 
 def make(tmp_path: Path, mode: str = "native", name: str = "dest") -> Catalog:
@@ -103,7 +112,7 @@ def test_dated_backup(tmp_path: Path) -> None:
     cat.register_source("a", fs_uuid="u1")
     target = cat.backup_dated()
     assert target.name == "catalog-20261118-120000.sqlite"
-    assert sqlite3.connect(target).execute("SELECT COUNT(*) FROM sources").fetchone()[0] == 1
+    assert query(target, "SELECT COUNT(*) FROM sources")[0] == 1
     cat.close()
 
 
@@ -112,7 +121,7 @@ def test_wsl_mode_copies_to_destination_after_each_commit(tmp_path: Path) -> Non
     cat = make(tmp_path, "wsl")
     cat.register_source("a", fs_uuid="u1")
     dest = tmp_path / "dest" / "_catalog" / "catalog.sqlite"
-    assert sqlite3.connect(dest).execute("SELECT COUNT(*) FROM sources").fetchone()[0] == 1
+    assert query(dest, "SELECT COUNT(*) FROM sources")[0] == 1
     assert not list(dest.parent.glob("*.tmp"))
     cat.close()
 
@@ -130,11 +139,11 @@ def test_wsl_interrupted_between_commit_and_sync_resolves_to_newer(
     cat.conn.close()
     monkeypatch.delenv("CONSOLIDATE_FAULT")
     dest = tmp_path / "dest" / "_catalog" / "catalog.sqlite"
-    assert sqlite3.connect(dest).execute("SELECT COUNT(*) FROM sources").fetchone()[0] == 1
+    assert query(dest, "SELECT COUNT(*) FROM sources")[0] == 1
     cat = make(tmp_path, "wsl")  # restart: the working copy is newer and wins
     assert cat.conn.execute("SELECT COUNT(*) FROM sources").fetchone()[0] == 2
     cat.close()  # and the drive copy is brought up to date at exit
-    assert sqlite3.connect(dest).execute("SELECT COUNT(*) FROM sources").fetchone()[0] == 2
+    assert query(dest, "SELECT COUNT(*) FROM sources")[0] == 2
 
 
 @pytest.mark.component
