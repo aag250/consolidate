@@ -31,6 +31,17 @@ CONFIG = Path(__file__).parent.parent.parent / "config"
         ("Users/u1/Documents/README", "sniff", "no-extension"),
         ("proj/node_modules/pkg/readme.txt", "exclude", "**/node_modules/"),
         ("Dev/notes.txt", "include", "txt"),  # Linux rules must not hit a Windows drive
+        # A profile copied into a backup folder, not under Users/
+        ("bak_2026/joe/AppData/Local/Google/x/data.docx", "exclude", "**/AppData/Local/"),
+        ("bak_2026/joe/AppData/Roaming/x/notes.docx", "exclude", "**/AppData/Roaming/"),
+        (
+            "bak_2026/joe/AppData/Local/Microsoft/Outlook/a.pst",
+            "include",
+            "exception:**/AppData/Local/Microsoft/Outlook/*.pst",
+        ),
+        ("bak_2026/joe/Documents/AppData/notes.docx", "include", "docx"),
+        ("bak_2026/joe/.vscode/extensions/ms-python/x.docx", "exclude", "**/.vscode/extensions/"),
+        ("Users/u1/Music/song.boy (mode 3 - ch 16)", "sniff", "no-extension"),
     ],
 )
 def test_classify(rules: Rules, path: str, action: str, rule: str) -> None:
@@ -59,15 +70,43 @@ def test_get_ext() -> None:
 
 
 @pytest.mark.unit
+@pytest.mark.parametrize(
+    ("name", "ext"),
+    [
+        ("model.3mf", "3mf"),
+        ("archive.7z", "7z"),
+        ("backup.043", "043"),
+        ("app.log.1", "1"),
+        ("Jump.automaticDestinations-ms", "automaticdestinations-ms"),
+        ("vimrc.un~", "un~"),
+        ("song.boy (mode 3 - ch 16)", ""),
+        ("Notes 3.5 (copy)", ""),
+        ("index.0-07218068cfa519613b646f716c6dc5b8db19e3779fe69bbb567d349ccd549385", ""),
+        ("blob.567f5df81ea0c9bdcfb7221f0ea091893150f8c16e3012e4f0314ba3d43f1632", ""),
+        ("events.2021-11-18t22-44-52z-00000", ""),
+        ("cache.32_13356250686655436", ""),
+        ("cache.4_13359585971024130", ""),
+        ("data.0000000001", ""),
+        ("recovery.jsonlz4-20260203002554", ""),
+        ("ms-toolsai.jupyter-2023.7.1002162226-win32-x64", ""),
+        ("x.0-0", ""),
+    ],
+)
+def test_get_ext_ignores_suffixes_that_are_not_extensions(name: str, ext: str) -> None:
+    assert get_ext(name) == ext
+
+
+@pytest.mark.unit
 def test_record_decision_keeps_comments_and_applies(tmp_path: Path) -> None:
     cfg = tmp_path / "file-types.toml"
     shutil.copy(CONFIG / "file-types.toml", cfg)
     before = cfg.read_text()
+    earlier = load_file_types(cfg).decided  # answers already recorded in the shipped config
     record_decision(cfg, "WEIRD", "include", "a/b.weird", dt.date(2026, 11, 18))
     after = cfg.read_text()
     assert after.startswith(before.rstrip("\n"))
     assert "# Answers to unknown-extension prompts" in after
-    assert load_file_types(cfg).decided == {"weird": "include"}
+    assert load_file_types(cfg).decided == {**earlier, "weird": "include"}
 
 
 @pytest.mark.unit

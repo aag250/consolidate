@@ -4,20 +4,23 @@
 # then runs the container's `intake` command.
 #
 #   intake.sh <device> <label> [--partition /dev/sdb1] [--smart-json FILE]
+#             [--strip-prefix PREFIX]...
 #
 # Environment: DRIVECON_SRV (default /srv) holds sources/<label> mount points and
 # intake/<label>.json; DRIVECON_CMD is the container command prefix.
 set -euo pipefail
 
-usage() { echo "usage: $0 <device> <label> [--partition DEV] [--smart-json FILE]" >&2; exit 2; }
+usage() { echo "usage: $0 <device> <label> [--partition DEV] [--smart-json FILE] [--strip-prefix P]..." >&2; exit 2; }
 [ $# -ge 2 ] || usage
 device=$1 label=$2
 shift 2
 partition="" smart_file=""
+strip_args=()
 while [ $# -gt 0 ]; do
   case $1 in
     --partition) partition=${2:?}; shift 2 ;;
     --smart-json) smart_file=${2:?}; shift 2 ;;
+    --strip-prefix) strip_args+=(--strip-prefix "${2:?}"); shift 2 ;;
     *) usage ;;
   esac
 done
@@ -102,4 +105,5 @@ json.dump(doc, open(out, "w"), indent=1)
 PY
 
 # shellcheck disable=SC2086
-exec $DRIVECON_CMD intake --label "$label" --device-info "/intake/$label.json"
+exec $DRIVECON_CMD intake --label "$label" --device-info "/intake/$label.json" \
+  ${strip_args[@]+"${strip_args[@]}"}

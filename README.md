@@ -40,6 +40,10 @@ tool asks you about it (include, exclude, or decide later) while the rest of the
 continues, and writes your answer back to `config/file-types.toml` so it applies to every
 later drive.
 
+Text after the last dot only counts as an extension when it looks like one: names ending in
+something like `.boy (mode 3 - ch 16)`, a hash, a long number or a timestamp are treated as
+having no extension and are sniffed with libmagic, rather than each becoming its own prompt.
+
 Exact duplicates are dropped, but every place each file was found stays in the catalog
 (`drivecon where`).
 
@@ -166,7 +170,9 @@ are recorded as "SMART not available" (not a problem). Labels may use letters, d
 `_` and `-`.
 
 Options: `--partition /dev/sdX1` to pick a partition, `--smart-json FILE` to supply SMART data
-collected elsewhere.
+collected elsewhere, `--strip-prefix P` (repeatable) to strip extra folder prefixes for this
+drive, such as a copied profile inside a backup folder (`--strip-prefix "laptop_backup/joe/Documents/"
+--strip-prefix "laptop_backup/joe/"`; list the more specific one first).
 
 **Network shares** have no block device. Mount the share read-only on the host under
 `/srv/sources/<label>` (`mount -t cifs //pc/share /srv/sources/<label> -o ro,...`), then

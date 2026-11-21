@@ -23,12 +23,27 @@ def split_path(path: str) -> list[str]:
     return [seg for seg in path.split("/") if seg]
 
 
+_EXT_CHARS = re.compile(r"[a-z0-9][a-z0-9_+~-]*")
+_EXT_ID = re.compile(r"\d{10,}|[0-9a-f]{16,}")  # timestamps, counters, hashes
+
+
 def get_ext(name: str) -> str:
-    """Lower-case extension without the dot; '' for no extension or dot-files."""
+    """Lower-case extension without the dot; '' for no extension or dot-files.
+
+    Text after the last dot only counts as an extension when it looks like one. Names
+    such as ``song.boy (mode 3 - ch 16)``, ``cache.0-07218068cf...``, ``log.2021-11-18t22-44z``
+    or ``data.32_13356250686655436`` have none, so they are sniffed instead of each
+    becoming its own unknown-extension prompt.
+    """
     stem, dot, ext = name.rpartition(".")
     if not dot or not stem:
         return ""
-    return ext.lower()
+    ext = ext.lower()
+    if not _EXT_CHARS.fullmatch(ext) or _EXT_ID.search(ext):
+        return ""
+    if ext[0].isdigit() and ("-" in ext or "_" in ext):  # 0-0, 4_1335..., 5-win32-x64
+        return ""
+    return ext
 
 
 def _seg_match(pat: str, seg: str, ci: bool) -> bool:

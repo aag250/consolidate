@@ -16,9 +16,9 @@ notes = "Windows.old/Users/ is still scanned"
 [[exclusion]]
 scope = "Windows per-user"
 os = "windows"
-patterns = ["Users/*/AppData/", "Documents and Settings/*/Application Data/", "Documents and Settings/*/Local Settings/"]
-non_examples = ["Users/u1/Documents/report.docx"]
-notes = "XP-era paths included"
+patterns = ["Users/*/AppData/", "Documents and Settings/*/Application Data/", "Documents and Settings/*/Local Settings/", "**/AppData/Local/", "**/AppData/LocalLow/", "**/AppData/Roaming/"]
+non_examples = ["Users/u1/Documents/report.docx", "Users/u1/Documents/AppData/report.docx"]
+notes = "XP-era paths included; the ** forms catch profiles copied into backup folders (laptop_backup/joe/AppData/Local/...)"
 
 [[exclusion]]
 scope = "Windows housekeeping"
@@ -43,8 +43,22 @@ notes = ".thunderbird holds mail; flip if email is in scope"
 [[exclusion]]
 scope = "Anywhere"
 os = "any"
-patterns = ["**/node_modules/", "**/__pycache__/", "**/.venv/", "**/venv/", "**/.git/", "**/steamapps/", "**/.Trash-*/", "**/.Spotlight-V100/", "**/.fseventsd/"]
+patterns = ["**/node_modules/", "**/__pycache__/", "**/.venv/", "**/venv/", "**/.git/", "**/steamapps/", "**/.Trash-*/", "**/.Spotlight-V100/", "**/.fseventsd/", "**/.vscode/extensions/", "**/.ssh/", "**/.tmp.driveupload/", "**/*.app/"]
 non_examples = ["Documents/report.docx"]
+
+[[exclusion]]
+scope = "Applications installed in user folders"
+os = "windows"
+patterns = ["**/Ubiquiti UniFi/", "**/vlc-*-win32/", "**/vlc-*-win64/", "**/ACROBAT4/", "**/ACRO4WIN/", "**/ACR4UNIX/", "**/Acrobat Reader 4.0/", "**/Reader Installer/"]
+non_examples = ["Users/u1/Documents/unifi setup notes.docx", "Users/u1/Books/Infectious diseases/READER/Icon.docx"]
+notes = "UniFi controller; portable VLC; Acrobat Reader 4 bundled on book CD-ROMs (the book PDFs sit outside these folders)"
+
+[[exclusion]]
+scope = "Not wanted"
+os = "any"
+patterns = ["**/toniebox_sd_card/", "**/tools/scapy/"]
+non_examples = ["Users/u1/Music/toniebox playlist.docx", "Users/u1/Documents/scapy notes.docx"]
+notes = "Temporary copy of a Toniebox SD card, no longer needed; a downloaded Scapy checkout"
 
 # Rescued even though they sit under an excluded path. Only used if the matching
 # file type is Include. Patterns must match the whole path.
@@ -54,8 +68,11 @@ pattern = "Users/*/AppData/Local/Microsoft/Outlook/*.pst"
 [[exception]]
 pattern = "Documents and Settings/*/Local Settings/Application Data/Microsoft/Outlook/*.pst"
 
+[[exception]]
+pattern = "**/AppData/Local/Microsoft/Outlook/*.pst"
+
 [junk]
-names = ["Thumbs.db", "desktop.ini", ".DS_Store", "._*", "~$*", "~*.tmp"]
+names = ["Thumbs.db", "desktop.ini", ".DS_Store", "._*", "~$*", "~*.tmp", "_viminfo", ".viminfo"]
 zero_byte = true
 # Image size floor: 0 = off. Set e.g. 10240 to drop icons below 10 KB.
 min_image_bytes = 0

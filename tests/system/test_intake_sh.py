@@ -39,7 +39,7 @@ def setup(tmp_path: Path, mount_opts: str = "ro,relatime") -> tuple[Path, dict[s
     )
     stub(b, "mount", f'echo "$@" > {tmp_path}/mount.args; touch {tmp_path}/mounted')
     stub(b, "df", "printf 'Used\\n123456\\n'")
-    stub(b, "fakecmd", f'echo "$@" > {tmp_path}/container.args')
+    stub(b, "fakecmd", f"printf '%s\\n' \"$@\" > {tmp_path}/container.args")
     env = {
         **os.environ,
         "PATH": f"{b}:{os.environ['PATH']}",
@@ -93,3 +93,12 @@ def test_intake_sh_uses_given_smart_json(tmp_path: Path) -> None:
     assert r.returncode == 0, r.stderr
     doc = json.loads((tmp_path / "srv" / "intake" / "L1.json").read_text())
     assert doc["smart"]["smart_status"]["passed"] is False
+
+
+@pytest.mark.system
+def test_intake_sh_passes_strip_prefixes_through(tmp_path: Path) -> None:
+    _, env = setup(tmp_path)
+    r = run(env, "/dev/sdb", "L1", "--strip-prefix", "Backup 2012/joe/", "--strip-prefix", "old/")
+    assert r.returncode == 0, r.stderr
+    args = (tmp_path / "container.args").read_text().splitlines()
+    assert args[-4:] == ["--strip-prefix", "Backup 2012/joe/", "--strip-prefix", "old/"]

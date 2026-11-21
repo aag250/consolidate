@@ -170,3 +170,313 @@ decision = "exclude"
 extensions = ["ttf", "otf", "fon", "fnt"]
 
 # Answers to unknown-extension prompts are appended below by `drivecon decide`.
+[[decided]]
+ext = "3mf"
+decision = "include"
+date = "2026-11-21"
+example = "anthony_laptop_backup_05032026/Anthony/Downloads/308 Winchester - 4935863/model.3mf"
+[[decided]]
+ext = "azw"
+decision = "include"
+date = "2026-11-21"
+example = "Users/Kelsey/Documents/My Kindle Content/book.azw"
+[[decided]]
+ext = "apkg"
+decision = "include"
+date = "2026-11-21"
+example = "Users/Kelsey/Documents/Anki/deck.apkg"
+[[decided]]
+ext = "tla"
+decision = "include"
+date = "2026-11-21"
+example = "anthony_laptop_backup_05032026/Anthony/tla/tla/spec.tla"
+[[decided]]
+ext = "thm"
+decision = "exclude"
+date = "2026-11-21"
+example = "Users/Kelsey/Desktop/Pictures/MVI_0001.THM"
+[[decided]]
+ext = "anki2"
+decision = "include"
+date = "2026-11-21"
+example = "Users/Kelsey/Documents/Anki/User 1/collection.anki2"
+[[decided]]
+ext = "enl"
+decision = "include"
+date = "2026-11-21"
+example = "Users/Kelsey/Documents/Documents/My EndNote Library.enl"
+[[decided]]
+ext = "blend"
+decision = "include"
+date = "2026-11-21"
+example = "anthony_laptop_backup_05032026/Anthony/Downloads/Tiny Dragon Egg Box (sturdier) - 6904530/files/DragonEggSturdier_v2.blend"
+[[decided]]
+ext = "flv"
+decision = "include"
+date = "2026-11-21"
+example = "Users/Kelsey/Documents/Anki/User 1/collection.media/Audio_Tutorial_Heart_Sounds.flv"
+[[decided]]
+ext = "cls"
+decision = "include"
+date = "2026-11-21"
+example = "anthony_laptop_backup_05032026/Anthony/tla/kdp.cls"
+[[decided]]
+ext = "sty"
+decision = "include"
+date = "2026-11-21"
+example = "anthony_laptop_backup_05032026/Anthony/tla/tlatex.sty"
+[[decided]]
+ext = "bat"
+decision = "include"
+date = "2026-11-21"
+example = "Users/Kelsey/Desktop/Vet Books/Wildlife + Zoo/Infectious and parasitic disease of wild animals/RUN_CD.BAT"
+[[decided]]
+ext = "aae"
+decision = "include"
+date = "2026-11-21"
+example = "Users/Kelsey/Desktop/Pictures/2016/Grad Party/IMG_1286.AAE"
+[[decided]]
+ext = "apnx"
+decision = "include"
+date = "2026-11-21"
+example = "Users/Kelsey/Documents/My Kindle Content/Aesops-Fables.apnx"
+[[decided]]
+ext = "mbp"
+decision = "include"
+date = "2026-11-21"
+example = "Users/Kelsey/Documents/My Kindle Content/Aesops-Fables.mbp"
+[[decided]]
+ext = "mbpv2"
+decision = "include"
+date = "2026-11-21"
+example = "Users/Kelsey/Documents/My Kindle Content/B0040895H2_EBOK.mbpV2"
+[[decided]]
+ext = "phl"
+decision = "include"
+date = "2026-11-21"
+example = "Users/Kelsey/Documents/My Kindle Content/B0040895H2_EBOK.phl"
+[[decided]]
+ext = "lpr"
+decision = "include"
+date = "2026-11-21"
+example = "Users/Kelsey/Documents/My Kindle Content/B0040895H2_EBOK.lpr"
+[[decided]]
+ext = "abt"
+decision = "exclude"
+date = "2026-11-21"
+example = "Users/Kelsey/Desktop/Vet Books/Wildlife + Zoo/Infectious and parasitic disease of wild animals/PDF/index/assists/00000021.abt"
+[[decided]]
+ext = "ddd"
+decision = "exclude"
+date = "2026-11-21"
+example = "Users/Kelsey/Desktop/Vet Books/Wildlife + Zoo/Infectious and parasitic disease of wild animals/PDF/index/parts/00000001.ddd"
+[[decided]]
+ext = "did"
+decision = "exclude"
+date = "2026-11-21"
+example = "Users/Kelsey/Desktop/Vet Books/Wildlife + Zoo/Infectious and parasitic disease of wild animals/PDF/index/parts/00000001.did"
+[[decided]]
+ext = "pdd"
+decision = "exclude"
+date = "2026-11-21"
+example = "Users/Kelsey/Desktop/Vet Books/Wildlife + Zoo/Infectious and parasitic disease of wild animals/PDF/index/pdd/00000009.pdd"
+[[decided]]
+ext = "pdx"
+decision = "exclude"
+date = "2026-11-21"
+example = "Users/Kelsey/Desktop/Vet Books/Wildlife + Zoo/Infectious and parasitic disease of wild animals/PDF/index.pdx"
+[[decided]]
+ext = "plc"
+decision = "exclude"
+date = "2026-11-21"
+example = "Users/Kelsey/Desktop/Vet Books/Wildlife + Zoo/Infectious and parasitic disease of wild animals/PDF/index/style/style.plc"
+[[decided]]
+ext = "trn"
+decision = "exclude"
+date = "2026-11-21"
+example = "Users/Kelsey/Desktop/Vet Books/Wildlife + Zoo/Infectious and parasitic disease of wild animals/PDF/index/trans/data.trn"
+[[decided]]
+ext = "wld"
+decision = "exclude"
+date = "2026-11-21"
+example = "Users/Kelsey/Desktop/Vet Books/Wildlife + Zoo/Infectious and parasitic disease of wild animals/PDF/index/assists/00000003.wld"
+[[decided]]
+ext = "icns"
+decision = "exclude"
+date = "2026-11-21"
+example = "Users/Kelsey/Desktop/Vet Books/Avian/Silverman Tell radiograph text/Silverman.app/Contents/Resources/document.icns"
+[[decided]]
+ext = "rsrc"
+decision = "exclude"
+date = "2026-11-21"
+example = "Users/Kelsey/Desktop/Vet Books/Avian/Silverman Tell radiograph text/Silverman.app/Contents/Resources/Flash Player.rsrc"
+[[decided]]
+ext = "plist"
+decision = "exclude"
+date = "2026-11-21"
+example = "Users/Kelsey/Desktop/Vet Books/Avian/Silverman Tell radiograph text/Silverman.app/Contents/Info.plist"
+[[decided]]
+ext = "av_"
+decision = "exclude"
+date = "2026-11-21"
+example = "anthony_laptop_backup_05032026/Anthony/Downloads/UFRII_Driver_V3030_W64_usEN_02/misc/ANIMIMG/USBANIM.AV_"
+[[decided]]
+ext = "hta"
+decision = "exclude"
+date = "2026-11-21"
+example = "anthony_laptop_backup_05032026/Anthony/Downloads/UFRII_Driver_V3030_W64_usEN_02/Readme.hta"
+[[decided]]
+ext = "bss"
+decision = "exclude"
+date = "2026-11-21"
+example = "anthony_laptop_backup_05032026/Anthony/Downloads/rufus_files/syslinux-6.04/ldlinux.bss"
+[[decided]]
+ext = "config"
+decision = "exclude"
+date = "2026-11-21"
+example = "anthony_laptop_backup_05032026/Anthony/Downloads/SolarWinds-FT-TracerouteNG-1.0.0/traceng.exe.config"
+[[decided]]
+ext = "ico"
+decision = "exclude"
+date = "2026-11-21"
+example = "anthony_laptop_backup_05032026/Anthony/Documents/My Shapes/_private/folder.ico"
+[[decided]]
+ext = "blf"
+decision = "exclude"
+date = "2026-11-21"
+example = "anthony_laptop_backup_05032026/Anthony/NTUSER.DAT{951a0ea2-f5ff-11f0-af7c-ff4459dca711}.TM.blf"
+[[decided]]
+ext = "log1"
+decision = "exclude"
+date = "2026-11-21"
+example = "Users/Kelsey/ntuser.dat.LOG1"
+[[decided]]
+ext = "dat"
+decision = "exclude"
+date = "2026-11-21"
+example = "anthony_laptop_backup_05032026/Anthony/MicrosoftEdgeBackups/backups/MicrosoftEdgeBackup20200311/MicrosoftEdgeCookiesBackup.dat"
+[[decided]]
+ext = "edb"
+decision = "exclude"
+date = "2026-11-21"
+example = "anthony_laptop_backup_05032026/Anthony/MicrosoftEdgeBackups/backups/MicrosoftEdgeBackup20200311/DatastoreBackup/spartan.edb"
+[[decided]]
+ext = "db2"
+decision = "exclude"
+date = "2026-11-21"
+example = "Users/Kelsey/Documents/Anki/User 1/collection.media.db2"
+[[decided]]
+ext = "search-ms"
+decision = "exclude"
+date = "2026-11-21"
+example = "anthony_laptop_backup_05032026/Anthony/Searches/Everywhere.search-ms"
+[[decided]]
+ext = "searchconnector-ms"
+decision = "exclude"
+date = "2026-11-21"
+example = "anthony_laptop_backup_05032026/Anthony/Searches/Microsoft OneNote.searchconnector-ms"
+[[decided]]
+ext = "igpi"
+decision = "exclude"
+date = "2026-11-21"
+example = "anthony_laptop_backup_05032026/Anthony/IntelGraphicsProfiles/Brighten Video.man.igpi"
+[[decided]]
+ext = "msrcincident"
+decision = "exclude"
+date = "2026-11-21"
+example = "anthony_laptop_backup_05032026/Anthony/Downloads/Invitation.msrcIncident"
+[[decided]]
+ext = "rdp"
+decision = "exclude"
+date = "2026-11-21"
+example = "anthony_laptop_backup_05032026/Anthony/Documents/Default.rdp"
+[[decided]]
+ext = "settings"
+decision = "exclude"
+date = "2026-11-21"
+example = "anthony_laptop_backup_05032026/Anthony/.android/analytics.settings"
+[[decided]]
+ext = "trk"
+decision = "exclude"
+date = "2026-11-21"
+example = "anthony_laptop_backup_05032026/Anthony/.android/metrics/spool/0d7c518c-f0be-4164-8db8-9156293859b3.trk"
+[[decided]]
+ext = "cache-7"
+decision = "exclude"
+date = "2026-11-21"
+example = "anthony_laptop_backup_05032026/Anthony/.cache/fontconfig/ef9c9ad8cc5857eb63cb3660bc8bd202-x86_64.cache-7"
+[[decided]]
+ext = "tag"
+decision = "exclude"
+date = "2026-11-21"
+example = "anthony_laptop_backup_05032026/Anthony/.cache/fontconfig/CACHEDIR.TAG"
+[[decided]]
+ext = "un~"
+decision = "exclude"
+date = "2026-11-21"
+example = "anthony_laptop_backup_05032026/Anthony/Desktop/.temp.txt.un~"
+[[decided]]
+ext = "swe"
+decision = "exclude"
+date = "2026-11-21"
+example = "anthony_laptop_backup_05032026/Anthony/_.swe"
+[[decided]]
+ext = "swf"
+decision = "exclude"
+date = "2026-11-21"
+example = "anthony_laptop_backup_05032026/Anthony/_.swf"
+[[decided]]
+ext = "swg"
+decision = "exclude"
+date = "2026-11-21"
+example = "anthony_laptop_backup_05032026/Anthony/_.swg"
+[[decided]]
+ext = "swh"
+decision = "exclude"
+date = "2026-11-21"
+example = "anthony_laptop_backup_05032026/Anthony/_.swh"
+[[decided]]
+ext = "swi"
+decision = "exclude"
+date = "2026-11-21"
+example = "anthony_laptop_backup_05032026/Anthony/_.swi"
+[[decided]]
+ext = "swj"
+decision = "exclude"
+date = "2026-11-21"
+example = "anthony_laptop_backup_05032026/Anthony/_.swj"
+[[decided]]
+ext = "swk"
+decision = "exclude"
+date = "2026-11-21"
+example = "anthony_laptop_backup_05032026/Anthony/_.swk"
+[[decided]]
+ext = "swl"
+decision = "exclude"
+date = "2026-11-21"
+example = "anthony_laptop_backup_05032026/Anthony/_.swl"
+[[decided]]
+ext = "swm"
+decision = "exclude"
+date = "2026-11-21"
+example = "anthony_laptop_backup_05032026/Anthony/_.swm"
+[[decided]]
+ext = "swn"
+decision = "exclude"
+date = "2026-11-21"
+example = "anthony_laptop_backup_05032026/Anthony/_.swn"
+[[decided]]
+ext = "swo"
+decision = "exclude"
+date = "2026-11-21"
+example = "anthony_laptop_backup_05032026/Anthony/_.swo"
+[[decided]]
+ext = "swp"
+decision = "exclude"
+date = "2026-11-21"
+example = "anthony_laptop_backup_05032026/Anthony/_.swp"
+[[decided]]
+ext = "regtrans-ms"
+decision = "exclude"
+date = "2026-11-21"
+example = "anthony_laptop_backup_05032026/Anthony/NTUSER.DAT{951a0ea2-f5ff-11f0-af7c-ff4459dca711}.TMContainer00000000000000000001.regtrans-ms"
