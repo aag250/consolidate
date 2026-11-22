@@ -113,3 +113,14 @@ def test_record_decision_keeps_comments_and_applies(tmp_path: Path) -> None:
 def test_record_decision_rejects_decide_later(tmp_path: Path) -> None:
     with pytest.raises(ValueError):
         record_decision(tmp_path / "x.toml", "a", "later", "p", dt.date(2026, 1, 1))
+
+
+@pytest.mark.unit
+def test_decision_matches_mime_type_in_any_case(rules: Rules) -> None:
+    # libmagic reports e.g. application/vnd.hp-HPGL; answers are recorded lower-case
+    rules.add_decision("mime:application/vnd.hp-HPGL", "exclude")
+    assert rules.file_type("mime:application/vnd.hp-HPGL") == (
+        "exclude",
+        "decided:mime:application/vnd.hp-hpgl",
+    )
+    assert rules.resolve_ext("mime:application/VND.HP-HPGL").action == "exclude"

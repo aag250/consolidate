@@ -480,3 +480,183 @@ ext = "regtrans-ms"
 decision = "exclude"
 date = "2026-11-21"
 example = "anthony_laptop_backup_05032026/Anthony/NTUSER.DAT{951a0ea2-f5ff-11f0-af7c-ff4459dca711}.TMContainer00000000000000000001.regtrans-ms"
+[[decided]]
+ext = "mime:application/octet-stream"
+decision = "exclude"
+date = "2026-11-22"
+example = "Boot/BCD"
+[[decided]]
+ext = "sdi"
+decision = "exclude"
+date = "2026-11-22"
+example = "Boot/boot.sdi"
+[[decided]]
+ext = "pol"
+decision = "exclude"
+date = "2026-11-22"
+example = "Users/CATS/ntuser.pol"
+[[decided]]
+ext = "contact"
+decision = "exclude"
+date = "2026-11-22"
+example = "Users/CATS/Contacts/CATS.contact"
+[[decided]]
+ext = "myi"
+decision = "exclude"
+date = "2026-11-22"
+example = "Users/CATS/Documents/My EndNote Library.Data/Trash/Trash.Data/rdb/csort.MYI"
+[[decided]]
+ext = "frm"
+decision = "exclude"
+date = "2026-11-22"
+example = "Users/CATS/Documents/My EndNote Library.Data/Trash/Trash.Data/rdb/csort.frm"
+[[decided]]
+ext = "opt"
+decision = "exclude"
+date = "2026-11-22"
+example = "Users/CATS/Documents/My EndNote Library.Data/Trash/Trash.Data/rdb/db.opt"
+[[decided]]
+ext = "myd"
+decision = "exclude"
+date = "2026-11-22"
+example = "Users/CATS/Documents/My EndNote Library.Data/Trash/Trash.Data/rdb/misc.MYD"
+[[decided]]
+ext = "itdb"
+decision = "exclude"
+date = "2026-11-22"
+example = "Users/CATS/Music/iTunes/iTunes Library Extras.itdb"
+[[decided]]
+ext = "itl"
+decision = "exclude"
+date = "2026-11-22"
+example = "Users/CATS/Music/iTunes/iTunes Library.itl"
+[[decided]]
+ext = "properties"
+decision = "exclude"
+date = "2026-11-22"
+example = "Users/Kelsey/pc-client.properties"
+[[decided]]
+ext = "conf"
+decision = "exclude"
+date = "2026-11-22"
+example = "Users/Kelsey/Documents/ActiveGSLocalData/activegs.conf"
+[[decided]]
+ext = "2mg"
+decision = "exclude"
+date = "2026-11-22"
+example = "Users/Kelsey/Documents/ActiveGSLocalData/THE_OREGON_TRAIL_35.057C5696/0_THE_OREGON_TRAIL_35.2MG"
+[[decided]]
+ext = "activegsxml"
+decision = "exclude"
+date = "2026-11-22"
+example = "Users/Kelsey/Documents/ActiveGSLocalData/oregontraildisk35.06A42B1A/oregontraildisk35.activegsxml"
+[[decided]]
+ext = "annot"
+decision = "exclude"
+date = "2026-11-22"
+example = "Users/Kelsey/Documents/My Digital Editions/Annotations/welcome.epub.annot"
+[[decided]]
+ext = "device"
+decision = "exclude"
+date = "2026-11-22"
+example = "Users/Kelsey/Dropbox/DCIM/MISC/.dropbox.device"
+[[decided]]
+ext = "itc2"
+decision = "exclude"
+date = "2026-11-22"
+example = "Users/Kelsey/Music/iTunes/Album Artwork/Cache/511C8319E1A0818B/00/00/08/511C8319E1A0818B-1C08A401F1F69800.itc2"
+[[decided]]
+ext = "enlx"
+decision = "exclude"
+date = "2026-11-22"
+example = "Users/Public/Documents/EndNote/Examples/Sample_Library_X5.enlx"
+[[decided]]
+ext = "fzip"
+decision = "exclude"
+date = "2026-11-22"
+example = "Users/Public/Foxit Software/Foxit Reader/StartPage/Advertisement/advertisement_en_us.fzip"
+[[decided]]
+ext = "css"
+decision = "exclude"
+date = "2026-11-22"
+example = "Users/Public/Foxit Software/Foxit Reader/StartPage/Start/en_us/skin.css"
+[[decided]]
+ext = "js"
+decision = "exclude"
+date = "2026-11-22"
+example = "Users/Public/Foxit Software/Foxit Reader/StartPage/Start/en_us/js/DD_belatedPNG.js"
+[[decided]]
+ext = "library-ms"
+decision = "exclude"
+date = "2026-11-22"
+example = "Users/Public/Libraries/RecordedTV.library-ms"
+[[decided]]
+ext = "wtv"
+decision = "exclude"
+date = "2026-11-22"
+example = "Users/Public/Recorded TV/Sample Media/win7_scenic-demoshort_raw.wtv"
+[[decided]]
+ext = "mime:application/vnd.hp-hpgl"
+decision = "exclude"
+date = "2026-11-22"
+example = "swtools/SP1"
+[[decided]]
+ext = "hdr"
+decision = "exclude"
+date = "2026-11-22"
+example = "swtools/readyapps/pwrmgrv/DATA1.HDR"
+[[decided]]
+ext = "id"
+decision = "exclude"
+date = "2026-11-22"
+example = "swtools/readyapps/pwrmgrv/DISKPMV.ID"
+[[decided]]
+ext = "ver"
+decision = "exclude"
+date = "2026-11-22"
+example = "swtools/readyapps/pwrmgrv/DISKPMV.VER"
+[[decided]]
+ext = "ex_"
+decision = "exclude"
+date = "2026-11-22"
+example = "swtools/readyapps/pwrmgrv/IKERNEL.EX_"
+[[decided]]
+ext = "bin"
+decision = "exclude"
+date = "2026-11-22"
+example = "swtools/readyapps/pwrmgrv/LAYOUT.BIN"
+[[decided]]
+ext = "cpl"
+decision = "exclude"
+date = "2026-11-22"
+example = "swtools/readyapps/pwrmgrv/PWMAL32V.CPL"
+[[decided]]
+ext = "tpi"
+decision = "exclude"
+date = "2026-11-22"
+example = "swtools/readyapps/pwrmgrv/PWRMGRV.TPI"
+[[decided]]
+ext = "inx"
+decision = "exclude"
+date = "2026-11-22"
+example = "swtools/readyapps/pwrmgrv/SETUP.INX"
+[[decided]]
+ext = "iss"
+decision = "exclude"
+date = "2026-11-22"
+example = "swtools/readyapps/pwrmgrv/SETUP.ISS"
+[[decided]]
+ext = "rdl"
+decision = "exclude"
+date = "2026-11-22"
+example = "swtools/readyapps/pwrmgrv/DK/PWMUI.RDL"
+[[decided]]
+ext = "chm"
+decision = "exclude"
+date = "2026-11-22"
+example = "swtools/readyapps/pwrmgrv/DK/PWRMGRV.CHM"
+[[decided]]
+ext = "tvt"
+decision = "exclude"
+date = "2026-11-22"
+example = "swtools/readyapps/rnr/Z934ZAB1011US00.TVT"

@@ -193,7 +193,7 @@ class Scanner:
             d = (
                 self.rules.resolve_ext(ext, "sniffed:")
                 if ext
-                else self.rules.resolve_ext(f"mime:{mime}")
+                else self.rules.resolve_ext(f"mime:{mime.lower()}")
             )
         if d.action in ("include", "pending"):
             self._upsert(rel, st, d, mime)

@@ -83,9 +83,10 @@ class Rules:
             for p in cat.patterns:
                 self._patterns.append((re.compile(p), cat.decision, p))
         for e, d in file_types.decided.items():
-            self._ext[e] = (d, f"decided:{e}")
+            self._ext[e.lower()] = (d, f"decided:{e.lower()}")
 
     def file_type(self, ext: str) -> tuple[str, str] | None:
+        ext = ext.lower()  # answers are stored lower-case; MIME names from libmagic are not
         if ext in self._ext:
             return self._ext[ext]
         for rx, decision, pat in self._patterns:
