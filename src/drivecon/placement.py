@@ -14,6 +14,8 @@ from drivecon.paths import (
     conflict_name,
     is_camera_dump,
     limit_length,
+    profile_prefixes,
+    profile_roots,
     sanitize_path,
     strip_prefix,
 )
@@ -28,9 +30,31 @@ class Placement:
     fits: bool  # False only for pathological paths that could not be shortened enough
 
 
+def source_profile_roots(cat: Catalog, source_id: int) -> list[tuple[str, ...]]:
+    """Copied user profiles on a source, judged by the folders the scan saw.
+
+    Uses the folders of kept files and of excluded ones (AppData, junk-only folders), so
+    a profile is recognized even when only some of its folders hold documents.
+    """
+    dirs: set[tuple[str, ...]] = set()
+    for (rel,) in cat.conn.execute("SELECT rel_path FROM files WHERE source_id=?", (source_id,)):
+        dirs.add(tuple(split_path(rel)[:-1]))
+    for (rel,) in cat.conn.execute(
+        "SELECT rel_path FROM excluded_dirs WHERE source_id=?", (source_id,)
+    ):
+        dirs.add(tuple(split_path(rel)))
+    return profile_roots(dirs)
+
+
 class Placer:
     def __init__(self, cat: Catalog, rules: PathRules) -> None:
         self.cat, self.rules = cat, rules
+        self._auto: dict[int, list[str]] = {}  # source_id -> detected profile prefixes
+
+    def _auto_prefixes(self, source_id: int) -> list[str]:
+        if source_id not in self._auto:
+            self._auto[source_id] = profile_prefixes(source_profile_roots(self.cat, source_id))
+        return self._auto[source_id]
 
     def _is_taken(self, path: str) -> bool:
         row = self.cat.conn.execute(
@@ -51,7 +75,8 @@ class Placer:
         rows = conn.execute(
             "SELECT f.id, f.source_id, s.label, s.interface, s.strip_prefixes, f.rel_path,"
             " f.size, f.mtime, f.ext FROM files f JOIN sources s ON s.id = f.source_id"
-            " WHERE f.hash=? AND f.status IN ('hashed','duplicate','copied') ORDER BY f.id",
+            " WHERE f.hash=? AND f.status IN ('hashed','duplicate','copied')"
+            " AND f.decision IS NOT 'exclude' ORDER BY f.id",
             (hash_,),
         ).fetchall()
         if not rows:
@@ -59,7 +84,8 @@ class Placer:
         cands: list[Candidate] = []
         meta: dict[int, tuple[str, int]] = {}  # source_id -> (interface, size)
         for fid, sid, label, iface, extra, rel, size, mtime, _ext in rows:
-            prefixes = [*json.loads(extra or "[]"), *self.rules.strip_prefixes]
+            prefixes = [*json.loads(extra or "[]"), *self._auto_prefixes(sid),
+                        *self.rules.strip_prefixes]  # fmt: skip
             segs = strip_prefix(split_path(rel), prefixes)
             conn.execute("UPDATE files SET logical_path=? WHERE id=?", ("/".join(segs), fid))
             cands.append(Candidate(sid, label, tuple(segs), mtime or 0.0))

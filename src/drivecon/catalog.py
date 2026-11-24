@@ -78,6 +78,13 @@ CREATE TABLE IF NOT EXISTS pending_extensions (
     example_paths TEXT, decision TEXT, decided_at TEXT
 );
 
+CREATE TABLE IF NOT EXISTS unknown_extensions (
+    source_id INTEGER NOT NULL REFERENCES sources(id),
+    ext TEXT NOT NULL, file_count INTEGER NOT NULL, total_bytes INTEGER NOT NULL,
+    example_paths TEXT,
+    PRIMARY KEY (source_id, ext)
+);
+
 CREATE TABLE IF NOT EXISTS conflicts (
     dest_path TEXT NOT NULL, hash TEXT NOT NULL, chosen_name TEXT NOT NULL,
     source_id INTEGER REFERENCES sources(id)
@@ -237,9 +244,13 @@ class Catalog:
         return target
 
     def close(self) -> None:
-        if self.mode == "wsl":
-            self.sync_to_dest()
-        self.conn.close()
+        # Under the lock: closing while a worker thread's statement is in flight
+        # segfaults in _sqlite3. A worker that tries again afterwards gets a clean
+        # ProgrammingError instead.
+        with self.lock:
+            if self.mode == "wsl":
+                self.sync_to_dest()
+            self.conn.close()
 
     # --- sources and runs -------------------------------------------------------------
 

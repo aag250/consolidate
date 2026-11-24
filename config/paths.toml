@@ -30,8 +30,9 @@ notes = "Excluded by decision"
 [[exclusion]]
 scope = "Linux system"
 os = "linux"
-patterns = ["bin/", "boot/", "dev/", "etc/", "lib*/", "opt/", "proc/", "run/", "sbin/", "snap/", "sys/", "tmp/", "usr/", "var/", "**/lost+found/"]
-non_examples = ["home/u1/Documents/report.docx"]
+patterns = ["bin/", "boot/", "dev/", "etc/", "lib*/", "opt/", "proc/", "run/", "sbin/", "snap/", "sys/", "tmp/", "usr/", "var/", "**/lost+found/", "root/", "media/", "mnt/"]
+non_examples = ["home/u1/Documents/report.docx", "home/u1/media/clip.docx"]
+notes = "root/ is the administrator's home; media/ and mnt/ are mount points, empty when the disk is offline"
 
 [[exclusion]]
 scope = "Linux per-user"
@@ -59,6 +60,43 @@ os = "any"
 patterns = ["**/toniebox_sd_card/", "**/tools/scapy/"]
 non_examples = ["Users/u1/Music/toniebox playlist.docx", "Users/u1/Documents/scapy notes.docx"]
 notes = "Temporary copy of a Toniebox SD card, no longer needed; a downloaded Scapy checkout"
+
+[[exclusion]]
+scope = "Applications installed at the drive root"
+os = "windows"
+patterns = ["Xilinx/", ".Xilinx/", "OrCAD/", "Cadence/", "xampp/", "Riot Games/", "Python2*/", "Python3*/", "crystalreportviewers*/", "TEMP/", "Apps/", "dell/", "usb_driver/", "$AVG/", "AC_SWM/", "CW Decoder/", "tools_v4.8/", "adb/", "Windows 7 Pro x64 SP1 & Activator/", "intelFPGA*/", "altera*/", "ti/", "Keil*/", "MentorGraphics/", "Modeltech*/", "MinGW/", "msys64/", "cygwin*/"]
+non_examples = ["Users/u1/Documents/Xilinx/report.docx", "Backup/Apps/report.docx"]
+notes = "Tools, games and installers people put next to Program Files; only at the drive root"
+
+[[exclusion]]
+scope = "Engineering tool installations, installers and their bundled samples, at any depth"
+os = "any"
+patterns = [
+  "**/ISE_DS/", "**/Xilinx/Vivado/", "**/Xilinx/Vitis/", "**/Xilinx/SDK/", "**/Xilinx/DocNav/", "**/Xilinx/Vivado_HLS/", "**/Xilinx_ISE_DS_*/", "**/Xilinx_Vivado_*/", "**/Xilinx_Unified_*/",
+  "**/OrCAD_*_Demo/", "**/OrCAD/OrCAD_*/", "**/Cadence/SPB_*/", "**/Cadence/OrCAD_*/", "**/Cadence/PSpice*/",
+  "**/altera/*/quartus/", "**/intelFPGA*/*/quartus/", "**/modelsim_ase/",
+  "**/Microchip/MPLABX/", "**/Microchip/xc8/", "**/Microchip/xc16/", "**/Microchip/xc32/", "**/Microchip/MPLAB C32 Suite/",
+  "**/ti/ccsv*/", "**/ti/ccs*/", "**/WinAVR-*/", "**/arduino-*-windows/", "**/arduino-1.*/",
+  "**/MATLAB/R20*/", "**/Mathworks.Matlab.*/", "**/LTspiceXVII/examples/", "**/LTspice/examples/",
+  "**/National Instruments/Circuit Design Suite*/", "**/National Instruments Downloads/", "Users/Public/Documents/PCB Artist/",
+  "**/eclipse*/plugins/", "**/eclipse*/features/", "**/eclipse*/configuration/", "**/eclipse*/p2/",
+  "**/jakarta-tomcat-*/", "**/apache-tomcat-*/", "**/webapps/examples/", "**/webapps/docs/", "**/Lib/site-packages/",
+  "**/dsPIC33E_PIC24E_Bootloader_*/", "**/Office2k7/",
+]
+non_examples = ["Users/u1/Documents/Xilinx/adder/adder.docx", "Users/u1/Documents/MATLAB/fft.docx", "Users/u1/Documents/eclipse notes.docx", "Users/u1/Dropbox/school/webapps/report.docx"]
+notes = "Matched by the install's folder structure, so a folder you named Xilinx or MATLAB yourself is still scanned"
+
+[[exclusion]]
+scope = "Developer tool settings, caches and repository internals"
+os = "any"
+patterns = ["**/.eclipse/", "**/.metadata/", "**/.netbeans/", "**/.explorer.cache/", "**/.explorer.local/", "**/.android/", "**/.hg/", "**/.dropbox/", "**/.dropbox.cache/", "**/Android/data/", "**/BlackBerry/app_world/"]
+non_examples = ["Users/u1/Documents/android notes.docx", "Users/u1/Pictures/Android/photo.docx"]
+
+[[exclusion]]
+scope = "Software and games copied into user folders"
+os = "any"
+patterns = ["**/Age Of Empires*/", "**/Warcraft III*/", "**/kernel/linux-*/"]
+non_examples = ["Users/u1/Documents/kernel notes.docx"]
 
 # Rescued even though they sit under an excluded path. Only used if the matching
 # file type is Include. Patterns must match the whole path.

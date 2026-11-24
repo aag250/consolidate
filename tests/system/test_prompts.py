@@ -12,6 +12,7 @@ import pexpect
 import pytest
 
 from drivecon.mockdevices import build_tree
+from tests.conftest import use_ask_mode
 
 ROOT = Path(__file__).parent.parent.parent
 N_DOCS = 150
@@ -22,6 +23,7 @@ class Run:
         self.tmp = tmp
         self.dest, self.config, self.sources = tmp / "dest", tmp / "config", tmp / "sources"
         shutil.copytree(ROOT / "config", self.config)
+        use_ask_mode(self.config)
         files = [{"path": f"a/x{i}.weird", "size": 8} for i in range(3)]
         files += [{"path": f"z/f{i:03}.docx", "size": 8, "key": str(i)} for i in range(N_DOCS)]
         build_tree({"seed": 3, "files": files}, self.sources / "M1")
@@ -37,8 +39,10 @@ class Run:
             env=self.env, check=True, capture_output=True,
         )  # fmt: skip
 
-    def spawn(self, *args: str, slow: bool = True) -> "pexpect.spawn[str]":
-        env = dict(self.env)
+    def spawn(
+        self, *args: str, slow: bool = True, env: dict[str, str] | None = None
+    ) -> "pexpect.spawn[str]":
+        env = {**self.env, **(env or {})}
         if slow:
             env |= {"CONSOLIDATE_THROTTLE": "0.02", "CONSOLIDATE_PROGRESS_EVERY": "10"}
         return pexpect.spawn(
@@ -58,24 +62,20 @@ def run(tmp_path: Path) -> Run:
     return Run(tmp_path)
 
 
-def counts(child: "pexpect.spawn[str]", n: int) -> list[int]:
-    seen = []
-    for _ in range(n):
-        child.expect(r"\[scan\] (\d+) files")
-        m = child.match
-        assert isinstance(m, re.Match)
-        seen.append(int(m.group(1)))
-    return seen
-
-
 @pytest.mark.system
-def test_progress_keeps_rising_while_prompt_is_open_then_include(run: Run) -> None:
-    child = run.spawn("scan", "M1")
+def test_progress_waits_while_prompt_is_open_and_the_question_is_repeated(run: Run) -> None:
+    child = run.spawn("scan", "M1", env={"CONSOLIDATE_REMIND_EVERY": "1"})
     child.expect(r"Unknown extension '\.weird': \d+ files")
     child.expect(r"\[d\]ecide later")
-    first, second = counts(child, 2)  # scanning continues behind the open prompt
-    assert second > first
+    child.expect(r"Still waiting for your answer after \d+s: work continues in the background")
+    assert "[scan]" not in str(child.before)  # progress never buries the open question
+    child.expect(r"Unknown extension '\.weird'")  # the question is shown again
+    child.expect(r"scanning finished; the run is waiting only for this answer", timeout=30)
+    assert "[scan]" not in str(child.before)
     child.sendline("i")
+    child.expect(r"\[scan\] (\d+) files")  # the latest progress, once answered
+    m = child.match
+    assert isinstance(m, re.Match) and int(m.group(1)) > 0
     child.expect(pexpect.EOF)
     child.close()
     assert child.exitstatus == 0

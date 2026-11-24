@@ -35,10 +35,19 @@ be processed one at a time, weeks apart, and an interrupted run is simply run ag
 
 Only the file types listed in `config/file-types.toml` (office documents, PDFs, photos, video,
 audio, email archives, source code, and so on). Applications, OS files, application data and
-settings are excluded by `config/paths.toml`. An extension on neither list is **held**: the
-tool asks you about it (include, exclude, or decide later) while the rest of the work
-continues, and writes your answer back to `config/file-types.toml` so it applies to every
-later drive.
+settings are excluded by `config/paths.toml`. What happens to an extension on neither list is
+set by `unknown` at the top of `config/file-types.toml`:
+
+- `unknown = "exclude"` (the default here): it is skipped, and never blocks a run or the
+  retire-safe verdict. Each run ends with a list of what was skipped, by extension with counts,
+  sizes and example paths; `report unknown [DRIVE]` and `_reports/unknown-excluded.csv` keep the
+  full list. To keep a type after all: `drivecon include-ext .xyz`, then re-run the drives it
+  names.
+- `unknown = "ask"`: it is **held**, and the tool asks you about it (include, exclude, or
+  decide later) while the rest of the work continues.
+
+Either way answers are written back to `config/file-types.toml` so they apply to every later
+drive.
 
 Text after the last dot only counts as an extension when it looks like one: names ending in
 something like `.boy (mode 3 - ch 16)`, a hash, a long number or a timestamp are treated as
@@ -61,8 +70,13 @@ _reports/               conflicts, renamed paths, likely versions, read errors
 
 **Merging trees.** Each source path is stripped to its meaningful part: drive letters,
 `Users/<name>/Documents/`, `Users/<name>/`, `Documents and Settings/<name>/My Documents/`,
-`home/<user>/` and backup wrappers like `Backup 2012/` are removed (extra prefixes per drive
-can be given at intake with `--strip-prefix`). So
+`home/<user>/` and backup wrappers like `Backup 2012/` are removed. A copied profile in a
+folder with any name is recognized by its contents: a folder holding at least three of the
+usual profile folders (Desktop, Documents, Downloads, Pictures, Music, Videos, Favorites,
+Contacts, AppData, ...) is merged the same way as `Users/<name>/`, so
+`KG 10.23.21 Backup/Documents/taxes/w2.pdf` also lands at `Files/taxes/w2.pdf`. Detected
+profiles are printed by `dry-run` and listed on the intake sheet. Extra prefixes per drive can
+still be given at intake with `--strip-prefix`. So
 `Users/joe/Documents/finance/taxes/2011/w2.pdf` on one drive and
 `Backup 2012/finance/taxes/2011/w2.pdf` on another both land at
 `Files/finance/taxes/2011/w2.pdf`.
@@ -145,6 +159,28 @@ docker compose build drivecon
 
 ## Processing a drive
 
+Mount the destination drive, plug in a source drive, and run one command with the whole
+disk (not a partition):
+
+```bash
+sudo scripts/backup-drive.sh /dev/sdX
+sudo scripts/backup-drive.sh /dev/sdX --dry-run                      # preview, writes nothing
+sudo scripts/backup-drive.sh /dev/sdX --label Dell-2009                # choose the label
+```
+
+Every partition with a filesystem is processed in turn as its own source, labelled
+`<label>-p<N>` (the label defaults to the drive's model and the end of its serial number). For
+each one it releases any other mount (such as the desktop's read-write automount), then runs
+`intake.sh` and `run` as below. A partition already in the catalog keeps its first label, so
+running the command again resumes rather than duplicates. Swap and empty partitions are skipped;
+encrypted, LVM and RAID members are listed for manual handling. At the end it prints `report
+sources` and unmounts the partitions so the drive can be unplugged. Sleep is blocked while it
+runs. It refuses to start if the destination is not mounted, or if the disk given holds the
+destination. Copied profiles are merged automatically (see [Where files land](#where-files-land));
+`--strip-prefix` is only needed for other wrapper folders, and applies to every partition.
+
+The steps it runs can also be used one at a time:
+
 ```bash
 # 1. Attach the drive. On the host, as root:
 sudo scripts/intake.sh /dev/sdX Dell-2009-C
@@ -190,7 +226,18 @@ Unknown extension '.xyz': 214 files, 1.3 GB so far
 [i]nclude, [e]xclude, [d]ecide later:
 ```
 
-Scanning and hashing carry on behind the prompt. Held files are processed once you answer.
+Scanning and hashing carry on behind the prompt, but their progress lines wait until you
+answer, so the question stays at the bottom of the screen. If it waits, it is repeated every
+minute, and once scanning and hashing have finished it says the run is waiting only for your
+answer. Held files are processed once you answer.
+
+**Progress.** Each phase prints a line every 1000 files and at least every 10 seconds, with a
+rough percentage and time left: the scan against the drive's used space, hashing against the
+bytes found so far (`of 12.3 GB found so far` until the scan ends), copying against the bytes
+still to copy. They are estimates. When nothing else has been printed for 30 seconds a
+`[working]` line names the file each phase is on and for how long, so a large file is not
+mistaken for a hang; a line that keeps naming the same file for many minutes on a quiet disk
+points at a slow or failing read.
 With no terminal (unattended runs), prompts are queued instead; answer them later with
 `decide`, and look at them with `report types`.
 
@@ -210,6 +257,7 @@ the secondary is needed). Paths inside the container are `/sources`, `/dest`, `/
 | Command | What it does |
 |---|---|
 | `intake --label L --device-info J` | Register a mounted source, check SMART, write `_intake/L.txt`. Called by `intake.sh`; use `--source-dir` instead of `--device-info` for a network share. `--strip-prefix P` (repeatable) strips an extra folder prefix for this drive. `--yes` continues past SMART warnings. |
+| `source-label --uuid U` | Print the label a partition is registered under (used by `backup-drive.sh`). |
 | `scan L` | Walk and classify; safe to re-run. |
 | `hash L` | Hash included files not yet hashed. |
 | `copy L` | Place and copy new files to `Files/`, verifying each. |
@@ -218,9 +266,12 @@ the secondary is needed). Paths inside the container are `/sources`, `/dest`, `/
 | `decide` | Answer queued unknown-extension prompts. |
 | `retry-errors L` | Re-attempt files that failed to read (then `run L`). |
 | `verify` | Re-hash every copied file against the catalog; reports missing, corrupt and unexpected files. |
+| `prune-excluded [--yes]` | Remove files from the backup that the rules now exclude everywhere they were found (after a rule change and a re-scan). Lists them and `_reports/excluded-in-backup.csv` first; asks before deleting. |
 | `where X` | Every original location of a file, by hash or by (part of) a path. |
 | `report sources` | Per-drive results, retire-safe flag, secondary lag. |
-| `report types` | Unknown and pending extensions by count and size. |
+| `report types` | Held extensions waiting for a decision (`unknown = "ask"`), by count and size. |
+| `report unknown [DRIVE]` | Extensions skipped as unknown (`unknown = "exclude"`), per drive, biggest first. |
+| `include-ext .EXT...` | Keep a type that was skipped as unknown; prints the drives to re-run. |
 | `report errors` | Files that failed to read. |
 | `report conflicts` / `report renamed` | Same-path conflicts and NTFS name changes. |
 | `report versions` | Same-named files with different content in similar folders: which might be newer. |
@@ -343,6 +394,18 @@ Windows PC with the tool running in WSL2 on that PC. The same image runs in both
 - **A different file already at a destination path** is reported as an error, never
   overwritten.
 - **A full destination** stops the run cleanly (exit code 4); free some space and run again.
+- **Changing the rules between runs** is safe. A complete re-scan reconciles what earlier scans
+  recorded: files that are now excluded, or no longer on the source, are dropped from the copy
+  and decision queues. Files already in the backup are never deleted by a scan; if the rules now
+  exclude them everywhere they were found, they are marked, and `prune-excluded` lists them and
+  removes them only after you confirm (each is re-hashed first; anything that does not match is
+  left alone). A backed-up file that has since been deleted from its source stays in the backup.
+  An interrupted scan, or a folder that could not be read, changes nothing.
+- **Copies are made durable in batches.** Up to 100 files are written under temp names, made
+  durable together, re-hashed, renamed, and the renames made durable before the catalog records
+  them. On local disk filesystems (`ntfs3`, `ext4`, `xfs`, ...) one `syncfs` covers a batch; on
+  FUSE (`ntfs-3g`), WSL drvfs and network shares each file and folder is fsynced. Small files copy
+  several times faster this way (about 4.5x on a USB hard disk through `ntfs3`).
 - **Resuming** is always just running the same command again. Each phase picks up only rows
   in the previous state (`seen` -> `hashed` -> `copied` or `duplicate`; `pending_decision` for
   unknown extensions; `error` for read failures).
@@ -409,6 +472,7 @@ src/drivecon/
   reports.py      results, where      photos.py      EXIF dates
   versions.py     likely versions
   fault.py        crash points        mockdevices.py synthetic source trees
+scripts/backup-drive.sh one command per drive, every partition
 scripts/intake.sh host-side intake helper
 config/           file-types.toml, paths.toml
 tests/            unit, component, system, fixtures

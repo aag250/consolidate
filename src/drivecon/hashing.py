@@ -13,16 +13,27 @@ import blake3
 
 from drivecon import fault
 from drivecon.catalog import Catalog
+from drivecon.console import CONSOLE, PROGRESS_SECS, Console
 
 CHUNK = 1 << 20
 
 
-def hash_file(path: str | Path) -> tuple[str, int]:
-    """BLAKE3 hex digest and the number of bytes actually read."""
+class HashStopped(Exception):
+    """The stop event was set partway through a file."""
+
+
+def hash_file(path: str | Path, stop: threading.Event | None = None) -> tuple[str, int]:
+    """BLAKE3 hex digest and the number of bytes actually read.
+
+    With ``stop``, checks it between chunks and raises HashStopped, so a large file
+    does not hold up a shutdown for as long as it takes to read.
+    """
     h = blake3.blake3()
     n = 0
     with open(path, "rb") as f:
         while chunk := f.read(CHUNK):
+            if stop is not None and stop.is_set():
+                raise HashStopped(str(path))
             h.update(chunk)
             n += len(chunk)
     return h.hexdigest(), n
@@ -49,8 +60,12 @@ class HashWorker:
         progress_every: int = 1000,
         throttle: float = 0.0,
         batch: int = 100,
+        progress_secs: float = PROGRESS_SECS,
+        console: Console = CONSOLE,
     ) -> None:
         self.cat, self.sid, self.root = cat, source_id, root
+        self.progress_secs, self.console = progress_secs, console
+        self._last_progress = time.monotonic()
         self.stop = stop or threading.Event()
         self.progress, self.progress_every, self.throttle = progress, progress_every, throttle
         self.batch = batch
@@ -66,10 +81,12 @@ class HashWorker:
                     (self.sid, self.batch),
                 ).fetchall()
             if not rows:
+                self.console.finished("hash")  # idle: nothing left to hash for now
                 if self.scan_done.is_set():
                     break
                 time.sleep(0.05)
                 continue
+            self.console.resumed("hash")
             results = [self._hash_one(*r) for r in rows]
             if self.stop.is_set() and not any(results):
                 break
@@ -88,10 +105,14 @@ class HashWorker:
             return None
         if self.throttle:
             time.sleep(self.throttle)
-        path = self.root / os.fsdecode(raw)
+        rel = os.fsdecode(raw)
+        path = self.root / rel
+        self.console.working_on("hash", rel, size or 0)
         try:
-            digest, n = hash_file(path)
+            digest, n = hash_file(path, self.stop)
             st = os.stat(path)
+        except HashStopped:
+            return None  # left 'seen'; the next run hashes it
         except OSError as e:
             self.stats.errors += 1
             return (
@@ -100,7 +121,10 @@ class HashWorker:
             )
         self.stats.hashed += 1
         self.stats.bytes += n
-        if self.progress and self.stats.hashed % self.progress_every == 0:
+        now = time.monotonic()
+        due = self.stats.hashed % self.progress_every == 0
+        if self.progress and (due or now - self._last_progress >= self.progress_secs):
+            self._last_progress = now
             self.progress(self.stats)
         # The file may have changed since the scan: trust what was actually read.
         return (

@@ -61,7 +61,14 @@ def test_not_safe_when_never_scanned_held_errored_or_unfinished(lab: Lab) -> Non
     sid, root = lab.add("A", [{"path": "d/x.docx", "size": 5}, {"path": "d/y.weird", "size": 5},
                               {"path": "d/z.docx", "size": 6}])  # fmt: skip
     assert "never fully scanned" in summarize(lab.cat, sid).reasons
-    Scanner(lab.cat, sid, root, lab.rules, PendingTracker()).run()
+    from dataclasses import replace
+
+    from drivecon.config import load_file_types
+    from drivecon.rules import Rules
+
+    ft = load_file_types(Path(__file__).parent.parent.parent / "config" / "file-types.toml")
+    ask = Rules(replace(ft, unknown="ask"), lab.pr)  # held files block retire-safe
+    Scanner(lab.cat, sid, root, ask, PendingTracker()).run()
     reasons = " ".join(summarize(lab.cat, sid).reasons)
     assert "unknown-extension" in reasons and "not copied yet" in reasons
     w = HashWorker(lab.cat, sid, root)

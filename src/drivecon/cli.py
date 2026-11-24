@@ -4,13 +4,15 @@ import os
 import sys
 import tempfile
 import threading
+import time
 from pathlib import Path
 from typing import Annotated, Literal, cast
 
 import typer
 
 from drivecon.catalog import Catalog
-from drivecon.config import load_file_types, load_path_rules
+from drivecon.config import load_file_types, load_path_rules, record_decision
+from drivecon.console import CONSOLE
 from drivecon.copier import CopyStats, DestinationFull, copy_source, verify
 from drivecon.hashing import HashStats, HashWorker
 from drivecon.intake import append_results, human, run_intake, synthetic_device
@@ -24,7 +26,8 @@ from drivecon.mirror import (
 )
 from drivecon.pending import PendingInfo, PendingTracker, release_decided
 from drivecon.photos import exif_date
-from drivecon.placement import Placer
+from drivecon.placement import Placer, source_profile_roots
+from drivecon.prune import find_candidates, prune, top_folders, write_listing
 from drivecon.reports import (
     conflict_rows,
     renamed_rows,
@@ -32,6 +35,7 @@ from drivecon.reports import (
     sources_table,
     summarize,
     summarize_all,
+    unknown_rows,
     where,
     write_reports,
 )
@@ -105,6 +109,23 @@ def intake(
             raise typer.Exit(3)
 
 
+@app.command(name="source-label")
+def source_label(
+    uuid: Annotated[str, typer.Option(help="Filesystem UUID of a partition.")],
+    dest: DestOpt = Path("/dest"),
+    catalog_mode: ModeOpt = "native",
+    work_dir: WorkOpt = None,
+) -> None:
+    """Print the label a partition is registered under, or nothing if it is new."""
+    cat = open_catalog(dest, catalog_mode, work_dir)
+    try:
+        row = cat.conn.execute("SELECT label FROM sources WHERE fs_uuid=?", (uuid,)).fetchone()
+    finally:
+        cat.close()
+    if row:
+        typer.echo(row[0])
+
+
 MirrorOpt = Annotated[Path, typer.Option(envvar="DRIVECON_MIRROR", help="Secondary drive.")]
 ConfigOpt = Annotated[Path, typer.Option(envvar="DRIVECON_CONFIG", help="Folder with the TOMLs.")]
 SourcesOpt = Annotated[Path, typer.Option(envvar="DRIVECON_SOURCES", help="Folder of sources.")]
@@ -124,9 +145,37 @@ def load_rules(config_dir: Path, os_kind: str, fs_type: str | None) -> Rules:
     )
 
 
+_CTX: tuple[Catalog, int] | None = None  # the catalog and source the live command works on
+
+
+def _live(cat: Catalog, sid: int) -> None:
+    """Start progress meters and the heartbeat/reminder ticker; _quiet() stops them."""
+    global _CTX
+    CONSOLE.reset()
+    _CTX = (cat, sid)
+    with cat.lock:
+        row = cat.conn.execute(
+            "SELECT used_bytes, interface FROM sources WHERE id=?", (sid,)
+        ).fetchone()
+    # A drive's used space bounds the scan; a folder source (network share) reports its
+    # whole filesystem's, which says nothing about the folder, so it gets counts only.
+    used = row[0] if row and row[0] and row[1] != "dir" else None
+    scan = CONSOLE.meter("scan")
+    scan.total, scan.final_total = used, True
+    CONSOLE.start()
+
+
+def _quiet() -> None:
+    global _CTX
+    CONSOLE.stop()
+    _CTX = None
+
+
 def _progress(stats: ScanStats) -> None:
-    typer.echo(
-        f"[scan] {stats.files_seen} files, {stats.included} included, {stats.pending} held",
+    walked = stats.included_bytes + stats.pending_bytes + stats.excluded_bytes
+    CONSOLE.meter("scan").update(walked, time.monotonic())
+    CONSOLE.status(
+        "scan", f"{stats.files_seen} files, {stats.included} included, {stats.pending} held"
     )
 
 
@@ -175,6 +224,13 @@ def _summarize(stats: ScanStats) -> None:
         f"excluded {stats.excluded_files} ({human(stats.excluded_bytes)}); "
         f"held {stats.pending}; errors {stats.errors}"
     )
+    if stats.dropped:
+        typer.echo(f"{stats.dropped} files from an earlier scan are now excluded or gone: dropped.")
+    if stats.retired:
+        typer.echo(
+            f"{stats.retired} files already in the backup are now excluded: "
+            "see `prune-excluded` to remove them from the backup."
+        )
 
 
 @app.command()
@@ -191,6 +247,7 @@ def scan(
     cat = open_catalog(dest, catalog_mode, work_dir)
     try:
         sid, fs_type = _source(cat, label)
+        _live(cat, sid)
         ensure_read_only(sources_root / label)
         rules = load_rules(config, os_kind, fs_type)
         throttle, every = _test_hooks()
@@ -200,9 +257,11 @@ def scan(
             interactive=interactive, today=dt.date.today(), progress=_progress,
             progress_every=every, throttle=throttle,
         )  # fmt: skip
+        _summarize(res.stats)
+        _unknown_summary(res.stats, cat, sid)
     finally:
+        _quiet()
         cat.close()
-    _summarize(res.stats)
     if res.interrupted:
         typer.echo("Interrupted; held files stay pending. Re-run scan to continue.", err=True)
         raise typer.Exit(130)
@@ -232,6 +291,8 @@ def dry_run(
                 "SELECT ext, file_count, total_bytes FROM pending_extensions ORDER BY ext"
             ):
                 typer.echo(f"  unknown .{ext}: {count} files, {human(total)}")
+            for line in _profile_lines(cat, sid):
+                typer.echo(line)
         finally:
             cat.close()
 
@@ -294,12 +355,110 @@ def report_types(
         typer.echo(f".{ext:<12} {count:>7} files {human(total):>10}   e.g. {first}")
 
 
+@report_app.command("unknown")
+def report_unknown(
+    label: Annotated[str | None, typer.Argument(help="Only this drive.")] = None,
+    dest: DestOpt = Path("/dest"),
+    catalog_mode: ModeOpt = "native",
+    work_dir: WorkOpt = None,
+) -> None:
+    """Extensions on no list that were skipped (unknown = "exclude"), biggest first."""
+    cat = open_catalog(dest, catalog_mode, work_dir)
+    try:
+        rows = unknown_rows(cat, label)
+    finally:
+        cat.close()
+    if not rows:
+        typer.echo("No unknown extensions were skipped.")
+        return
+    for drive, ext, n, size, examples in rows:
+        first = examples.split(" | ")[0]
+        typer.echo(f"{drive:<16} .{ext:<14} {n:>7} files {human(size):>10}   e.g. {first}")
+    typer.echo("To keep one from now on: drivecon include-ext .EXT, then re-run that drive.")
+
+
+@app.command(name="include-ext")
+def include_ext(
+    exts: Annotated[list[str], typer.Argument(help="Extensions to keep, e.g. .3mf .blend")],
+    config: ConfigOpt = Path("/config"),
+    dest: DestOpt = Path("/dest"),
+    catalog_mode: ModeOpt = "native",
+    work_dir: WorkOpt = None,
+) -> None:
+    """Keep an extension that was skipped as unknown; re-run the drives that had it."""
+    cat = open_catalog(dest, catalog_mode, work_dir)
+    try:
+        today = dt.date.today()
+        drives: set[str] = set()
+        for raw in exts:
+            ext = raw.strip().lstrip(".").lower()
+            if not ext:
+                continue
+            rows = cat.conn.execute(
+                "SELECT s.label, u.example_paths FROM unknown_extensions u"
+                " JOIN sources s ON s.id = u.source_id WHERE u.ext=?",
+                (ext,),
+            ).fetchall()
+            example = next((json.loads(x or "[]")[0] for _, x in rows if json.loads(x or "[]")), "")
+            record_decision(config / "file-types.toml", ext, "include", example, today)
+            drives.update(r[0] for r in rows)
+            typer.echo(
+                f".{ext}: included from now on" + (f" (seen on {len(rows)} drives)" if rows else "")
+            )
+    finally:
+        cat.close()
+    if drives:
+        typer.echo("Re-run these drives to copy the files: " + ", ".join(sorted(drives)))
+
+
+def _unknown_summary(stats: ScanStats, cat: Catalog, sid: int) -> None:
+    if not stats.unknown_files:
+        return
+    rows = unknown_rows(
+        cat, cat.conn.execute("SELECT label FROM sources WHERE id=?", (sid,)).fetchone()[0]
+    )
+    typer.echo(
+        f"Skipped {stats.unknown_files} files ({human(stats.unknown_bytes)}) with "
+        f"{len(rows)} unknown extensions:"
+    )
+    for _drive, ext, n, size, examples in rows[:8]:
+        typer.echo(f"  .{ext:<14} {n:>7} files {human(size):>10}   e.g. {examples.split(' | ')[0]}")
+    if len(rows) > 8:
+        typer.echo(f"  ... and {len(rows) - 8} more")
+    typer.echo("Full list: `report unknown`. To keep one: `include-ext .EXT`, then re-run.")
+
+
 def _hash_progress(stats: HashStats) -> None:
-    typer.echo(f"[hash] {stats.hashed} files, {human(stats.bytes)}")
+    if _CTX is not None:
+        cat, sid = _CTX
+        with cat.lock:
+            done, total = cat.conn.execute(
+                "SELECT COALESCE(SUM(CASE WHEN status<>'seen' THEN size END), 0),"
+                " COALESCE(SUM(size), 0) FROM files"
+                " WHERE source_id=? AND status IN ('seen','hashed','duplicate','copied')",
+                (sid,),
+            ).fetchone()
+        m = CONSOLE.meter("hash")
+        m.final_total = CONSOLE.is_finished("scan")  # the total grows until the scan is done
+        m.update(done, time.monotonic(), total)
+    CONSOLE.status("hash", f"{stats.hashed} files, {human(stats.bytes)}")
 
 
 def _copy_progress(stats: CopyStats) -> None:
-    typer.echo(f"[copy] {stats.copied} copied, {stats.duplicates} duplicates")
+    CONSOLE.meter("copy").update(stats.bytes, time.monotonic())
+    CONSOLE.status("copy", f"{stats.copied} copied, {stats.duplicates} duplicates")
+
+
+def _copy_total(cat: Catalog, sid: int) -> int:
+    """Bytes this source still has to copy: each new content once."""
+    with cat.lock:
+        row = cat.conn.execute(
+            "SELECT COALESCE(SUM(size), 0) FROM (SELECT f.hash, MAX(f.size) AS size FROM files f"
+            " LEFT JOIN blobs b ON b.hash=f.hash AND b.copied_at IS NOT NULL"
+            " WHERE f.source_id=? AND f.status='hashed' AND b.hash IS NULL GROUP BY f.hash)",
+            (sid,),
+        ).fetchone()
+    return int(row[0])
 
 
 def _copy_phase(
@@ -307,6 +466,8 @@ def _copy_phase(
 ) -> CopyStats:
     _, _, copy_batch = _batches()
     pr = load_path_rules(config / "paths.toml")
+    meter = CONSOLE.meter("copy")
+    meter.total, meter.final_total = _copy_total(cat, sid) or None, True
     throttle, every = _test_hooks()
     return copy_source(
         cat, sid, root, Placer(cat, pr), dest, exif=exif_date,
@@ -320,12 +481,33 @@ def _mirror_lag(cat: Catalog) -> list[tuple[str, int, int]]:
     return [(label, *behind(cat, mid)) for mid, label in rows]
 
 
+def _profile_lines(cat: Catalog, sid: int) -> list[str]:
+    """Detected copied profiles, as shown by dry-run and on the intake sheet."""
+    roots = source_profile_roots(cat, sid)
+    if not roots:
+        return []
+    return ["Profile folders merged into Files/:"] + [
+        "  " + ("/".join(r) + "/" if r else "(drive root)") for r in sorted(roots)
+    ]
+
+
 def _record_results(cat: Catalog, sid: int, dest: Path) -> None:
     """Append this drive's results to its intake sheet and refresh _reports/."""
     summary = summarize(cat, sid)
     sheet = dest / "_intake" / f"{summary.label}.txt"
+    profiles = _profile_lines(cat, sid)
+    n_unknown, n_ext = cat.conn.execute(
+        "SELECT COALESCE(SUM(file_count), 0), COUNT(*) FROM unknown_extensions WHERE source_id=?",
+        (sid,),
+    ).fetchone()
     if sheet.exists():
-        append_results(sheet, results_block(summary, dt.date.today()))
+        block = results_block(summary, dt.date.today())
+        extra = [f"   {ln}"[:71] for ln in profiles]
+        if n_unknown:
+            extra.append(f"   Unknown types skipped: {n_unknown} files, {n_ext} extensions")
+        append_results(sheet, "\n".join([block, *extra]))
+    for line in profiles:
+        typer.echo(line)
     write_reports(cat, dest)
     cat.backup_dated()  # a dated catalog copy after each drive
     for label, files, size in _mirror_lag(cat):
@@ -363,6 +545,7 @@ def hash_cmd(
     cat = open_catalog(dest, catalog_mode, work_dir)
     try:
         sid, _ = _source(cat, label)
+        _live(cat, sid)
         ensure_read_only(sources_root / label)
         throttle, every = _test_hooks()
         worker = HashWorker(cat, sid, sources_root / label, progress=_hash_progress,
@@ -371,6 +554,7 @@ def hash_cmd(
         worker.scan_done.set()
         stats = worker.run()
     finally:
+        _quiet()
         cat.close()
     typer.echo(f"Hashed {stats.hashed} files ({human(stats.bytes)}); errors {stats.errors}")
 
@@ -389,6 +573,7 @@ def copy(
     code = 0
     try:
         sid, _ = _source(cat, label)
+        _live(cat, sid)
         ensure_read_only(sources_root / label)
         stats = _copy_phase(cat, sid, sources_root / label, config, dest, threading.Event())
         _finish_copy(stats)
@@ -400,6 +585,7 @@ def copy(
         typer.echo("Interrupted; re-run to continue.", err=True)
         code = 130
     finally:
+        _quiet()
         cat.close()
     if code:
         raise typer.Exit(code)
@@ -420,6 +606,7 @@ def run(
     code = 0
     try:
         sid, fs_type = _source(cat, label)
+        _live(cat, sid)
         root = sources_root / label
         ensure_read_only(root)
         rules = load_rules(config, os_kind, fs_type)
@@ -433,6 +620,7 @@ def run(
             throttle=throttle, hasher=hasher, batch_size=scan_batch,
         )  # fmt: skip
         _summarize(res.stats)
+        _unknown_summary(res.stats, cat, sid)
         if res.interrupted:
             typer.echo("Interrupted; re-run to continue.", err=True)
             code = 130
@@ -449,9 +637,70 @@ def run(
         typer.echo("Interrupted; re-run to continue.", err=True)
         code = 130
     finally:
+        _quiet()
         cat.close()
     if code:
         raise typer.Exit(code)
+
+
+@app.command(name="prune-excluded")
+def prune_excluded(
+    yes: Annotated[bool, typer.Option(help="Delete without asking.")] = False,
+    dest: DestOpt = Path("/dest"),
+    catalog_mode: ModeOpt = "native",
+    work_dir: WorkOpt = None,
+) -> None:
+    """Remove files from the backup that the rules now exclude everywhere they were found."""
+    cat = open_catalog(dest, catalog_mode, work_dir)
+    try:
+        cands = find_candidates(cat)
+        if not cands:
+            typer.echo("Nothing to remove: every file in the backup is still wanted.")
+            return
+        listing = dest / "_reports" / "excluded-in-backup.csv"
+        write_listing(cands, listing)
+        total = sum(c.size for c in cands)
+        typer.echo(
+            f"{len(cands)} files ({human(total)}) in the backup are now excluded by the rules"
+        )
+        typer.echo("everywhere they were found. Largest folders:")
+        for folder, n, size in top_folders(cands)[:15]:
+            typer.echo(f"  {n:7d} {human(size):>10}  {folder}")
+        rules: dict[str, int] = {}
+        for c in cands:
+            rules[c.rule] = rules.get(c.rule, 0) + 1
+        typer.echo("Excluded by:")
+        for rule, n in sorted(rules.items(), key=lambda r: -r[1])[:10]:
+            typer.echo(f"  {n:7d}  {rule}")
+        typer.echo(f"Full list: {listing}")
+        if not yes:
+            if not sys.stdin.isatty():
+                typer.echo("Nothing deleted. Run again with --yes to remove them.")
+                return
+            if not typer.confirm(
+                f"Delete these {len(cands)} files from the backup?", default=False
+            ):
+                typer.echo("Nothing deleted.")
+                return
+        res = prune(
+            cat, dest, cands,
+            progress=lambda r: typer.echo(f"[prune] {r.removed} removed, {human(r.bytes)}"),
+        )  # fmt: skip
+        write_reports(cat, dest)
+        cat.backup_dated()
+    finally:
+        cat.close()
+    typer.echo(
+        f"Removed {res.removed} files ({human(res.bytes)}) and {res.dirs_removed} empty folders."
+    )
+    if res.missing:
+        typer.echo(f"{res.missing} were already gone from the backup; the catalog is cleaned up.")
+    if res.mismatched:
+        typer.echo(f"{len(res.mismatched)} files left alone: their content no longer matches:")
+        for m in res.mismatched[:20]:
+            typer.echo(f"  {m}")
+        raise typer.Exit(1)
+    typer.echo("A secondary drive keeps its copies until `sync-mirror --prune`.")
 
 
 @app.command(name="verify")

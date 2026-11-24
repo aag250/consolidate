@@ -205,3 +205,49 @@ def test_conflict_name_adds_source_and_date_and_numbers_repeats() -> None:
         "budget.xlsx", "Dell-2009-C", mtime, lambda p: p.lower() in taken, "Files/finance"
     )
     assert second == "budget (Dell-2009-C, 2011-03-04) 2.xlsx"
+
+
+@pytest.mark.unit
+def test_a_folder_holding_three_profile_folders_is_a_profile_whatever_its_name() -> None:
+    from drivecon.paths import profile_roots
+
+    dirs = [
+        ("KG 10.23.21 Backup", "Desktop"),
+        ("KG 10.23.21 Backup", "documents", "taxes"),
+        ("KG 10.23.21 Backup", "Downloads"),
+        ("Projects", "site", "Documents"),  # two profile names only: not a profile
+        ("Projects", "site", "Pictures"),
+    ]
+    assert profile_roots(dirs) == [("KG 10.23.21 Backup",)]
+
+
+@pytest.mark.unit
+def test_profiles_are_listed_deepest_first_and_the_drive_root_can_be_one() -> None:
+    from drivecon.paths import profile_roots
+
+    dirs: list[tuple[str, ...]] = [("Desktop",), ("Documents",), ("Music",)]
+    dirs += [("Documents", "old pc", "joe", d) for d in ("Desktop", "Documents", "AppData")]
+    assert profile_roots(dirs) == [("Documents", "old pc", "joe"), ()]
+
+
+@pytest.mark.unit
+def test_profile_prefixes_merge_documents_and_escape_glob_characters() -> None:
+    from drivecon.paths import profile_prefixes
+
+    roots = [("Documents", "Old [PC]", "joe"), ()]
+    prefixes = profile_prefixes(roots)
+    assert prefixes == [
+        "Documents/Old [[]PC]/joe/Documents/",
+        "Documents/Old [[]PC]/joe/My Documents/",
+        "Documents/Old [[]PC]/joe/",
+        "Documents/",
+        "My Documents/",
+    ]
+
+    def strip(p: str) -> str:
+        return "/".join(strip_prefix(p.split("/"), prefixes))
+
+    assert strip("Documents/Old [PC]/joe/Documents/taxes/w2.pdf") == "taxes/w2.pdf"
+    assert strip("Documents/Old [PC]/joe/Desktop/a.txt") == "Desktop/a.txt"
+    assert strip("Documents/budget.xlsx") == "budget.xlsx"
+    assert strip("Desktop/b.txt") == "Desktop/b.txt"

@@ -1,8 +1,11 @@
+import _thread
 import datetime as dt
 import os
 import shutil
 import sqlite3
 import sys
+import threading
+import time
 from pathlib import Path
 from typing import Any
 
@@ -11,11 +14,13 @@ import pytest
 from drivecon import fault
 from drivecon.catalog import Catalog
 from drivecon.config import load_file_types, load_path_rules
+from drivecon.hashing import CHUNK, HashStats, HashStopped, HashWorker, hash_file
 from drivecon.mockdevices import build_tree, load_spec
 from drivecon.pending import PendingInfo, PendingTracker
 from drivecon.rules import Rules
 from drivecon.scan import Scanner, ScanStats
 from drivecon.session import SessionResult, run_scan_session
+from tests.conftest import use_ask_mode
 
 ROOT = Path(__file__).parent.parent.parent
 DEVICES = ROOT / "tests" / "fixtures" / "devices"
@@ -27,6 +32,7 @@ class Env:
     def __init__(self, tmp: Path, spec: str | None = "win7") -> None:
         self.config = tmp / "config"
         shutil.copytree(ROOT / "config", self.config)
+        use_ask_mode(self.config)  # these tests cover holding and prompting
         self.root = tmp / "src"
         self.root.mkdir()
         if spec:
@@ -232,3 +238,205 @@ def test_interrupt_during_prompt_stops_cleanly_and_keeps_held_files(env: Env) ->
     ] == len(held)
     conn = sqlite3.connect(env.cat.dest_file)
     assert conn.execute("SELECT COUNT(*) FROM files").fetchone()[0] == len(env.files())
+
+
+def _tree(env: Env, files: dict[str, bytes]) -> None:
+    for rel, data in files.items():
+        p = env.root / rel
+        p.parent.mkdir(parents=True, exist_ok=True)
+        p.write_bytes(data)
+
+
+def _exclude(env: Env, pattern: str) -> None:
+    with (env.config / "paths.toml").open("a") as f:
+        f.write(f'\n[[exclusion]]\nscope = "test"\nos = "any"\npatterns = ["{pattern}"]\n')
+    env.rules = env.new_rules()
+
+
+def _decisions(env: Env) -> dict[str, tuple[str, str]]:
+    rows = env.cat.conn.execute("SELECT rel_path, status, decision FROM files")
+    return {r[0]: (r[1], r[2]) for r in rows}
+
+
+@pytest.mark.component
+def test_rescan_after_rules_change_drops_queued_rows_and_marks_backed_up_ones(
+    tmp_path: Path,
+) -> None:
+    env = Env(tmp_path, spec=None)
+    _tree(env, {"Tools/x/a.docx": b"a", "Tools/x/b.docx": b"b", "Tools/x/c.weird": b"c",
+                "Users/u1/Documents/keep.docx": b"k"})  # fmt: skip
+    env.scan()
+    env.cat.conn.execute(
+        "UPDATE files SET status='copied', hash='ha' WHERE rel_path='Tools/x/a.docx'"
+    )
+    _exclude(env, "Tools/")
+    stats = env.scan()
+    assert (stats.dropped, stats.retired) == (2, 1)
+    assert _decisions(env) == {
+        "Tools/x/a.docx": ("copied", "exclude"),  # in the backup: kept as history, marked
+        "Users/u1/Documents/keep.docx": ("seen", "include"),
+    }
+    held = env.cat.conn.execute("SELECT COUNT(*) FROM pending_extensions WHERE ext='weird'")
+    assert held.fetchone() == (0,)  # the held .weird file no longer waits on a decision
+    assert env.scan().retired == 0  # already marked: nothing more to do
+
+
+@pytest.mark.component
+def test_a_backed_up_file_deleted_from_the_source_is_left_alone(tmp_path: Path) -> None:
+    env = Env(tmp_path, spec=None)
+    _tree(env, {"Users/u1/Documents/old.docx": b"o", "Users/u1/Documents/new.docx": b"n"})
+    env.scan()
+    env.cat.conn.execute(
+        "UPDATE files SET status='copied', hash='h' WHERE rel_path LIKE '%old.docx'"
+    )
+    (env.root / "Users/u1/Documents/old.docx").unlink()
+    (env.root / "Users/u1/Documents/new.docx").unlink()
+    stats = env.scan()
+    assert (stats.dropped, stats.retired) == (1, 0)
+    assert _decisions(env) == {"Users/u1/Documents/old.docx": ("copied", "include")}
+
+
+@pytest.mark.component
+@pytest.mark.skipif(
+    sys.platform == "win32" or os.geteuid() == 0, reason="needs POSIX permissions as non-root"
+)
+def test_rows_under_a_folder_that_cannot_be_read_are_not_touched(tmp_path: Path) -> None:
+    env = Env(tmp_path, spec=None)
+    _tree(env, {"Users/u1/Documents/a.docx": b"a", "Users/u1/Pictures/p.docx": b"p"})
+    env.scan()
+    locked = env.root / "Users/u1/Pictures"
+    locked.chmod(0)
+    try:
+        stats = env.scan()
+    finally:
+        locked.chmod(0o755)
+    assert stats.dropped == 0
+    assert _decisions(env)["Users/u1/Pictures/p.docx"] == ("seen", "include")
+
+
+@pytest.mark.component
+def test_an_interrupted_scan_does_not_reconcile(tmp_path: Path) -> None:
+    import threading
+
+    env = Env(tmp_path, spec=None)
+    _tree(env, {"Tools/a.docx": b"a"})
+    env.scan()
+    _exclude(env, "Tools/")
+    stop = threading.Event()
+    stop.set()
+    stats = env.scan(stop=stop)
+    assert stats.dropped == 0 and _decisions(env) == {"Tools/a.docx": ("seen", "include")}
+
+
+@pytest.mark.component
+@pytest.mark.skipif(
+    sys.platform == "win32" or os.geteuid() == 0, reason="needs POSIX permissions as non-root"
+)
+def test_an_unreadable_folder_inside_an_excluded_tree_is_not_a_read_error(tmp_path: Path) -> None:
+    env = Env(tmp_path, spec=None)
+    _tree(env, {"Windows/System32/config/SAM": b"x", "Users/u1/Documents/a.docx": b"a"})
+    locked = env.root / "Windows/System32/config"
+    locked.chmod(0)
+    try:
+        stats = env.scan()
+    finally:
+        locked.chmod(0o755)
+    assert stats.errors == 0
+    assert _decisions(env) == {"Users/u1/Documents/a.docx": ("seen", "include")}
+
+
+@pytest.mark.component
+@pytest.mark.skipif(
+    sys.platform == "win32" or os.geteuid() == 0, reason="needs POSIX permissions as non-root"
+)
+def test_an_unreadable_folder_that_could_hold_a_rescued_file_is_still_reported(
+    tmp_path: Path,
+) -> None:
+    env = Env(tmp_path, spec=None)
+    _tree(env, {"Users/u1/AppData/Local/Microsoft/Outlook/mail.pst": b"m"})
+    locked = env.root / "Users/u1/AppData/Local/Microsoft"
+    locked.chmod(0)
+    try:
+        stats = env.scan()
+    finally:
+        locked.chmod(0o755)
+    assert stats.errors == 1  # an Outlook .pst could be in there: the drive is not retire-safe
+
+
+class _SlowHasher(HashWorker):
+    """Hashes nothing; runs until told to stop, then records that it has exited."""
+
+    def __init__(self, env: Env, *, interrupt_after_scan: bool = False) -> None:
+        super().__init__(env.cat, env.sid, env.root)
+        self.interrupt_after_scan = interrupt_after_scan
+        self.exited = threading.Event()
+
+    def run(self) -> HashStats:
+        try:
+            if self.interrupt_after_scan:
+                self.scan_done.wait(10)
+                _thread.interrupt_main()  # Ctrl-C while the main thread waits on stragglers
+            while not self.stop.wait(0.01):
+                with self.cat.lock:
+                    self.cat.conn.execute("SELECT COUNT(*) FROM files").fetchone()
+            return self.stats
+        finally:
+            self.exited.set()
+
+
+@pytest.mark.component
+def test_interrupt_while_hashing_stragglers_stops_the_hasher_before_returning(
+    env: Env,
+) -> None:
+    hasher = _SlowHasher(env, interrupt_after_scan=True)
+    res = session(env, None, hasher=hasher)
+    assert res.interrupted
+    assert hasher.exited.is_set()  # the caller may now close the catalog safely
+    env.cat.close()
+
+
+@pytest.mark.component
+def test_scan_error_stops_the_hasher_before_raising(
+    env: Env, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    def boom(self: Scanner) -> ScanStats:
+        raise OSError("drive went away")
+
+    monkeypatch.setattr(Scanner, "run", boom)
+    hasher = _SlowHasher(env)
+    with pytest.raises(OSError, match="drive went away"):
+        session(env, None, hasher=hasher)
+    assert hasher.exited.is_set()
+    env.cat.close()
+
+
+@pytest.mark.component
+def test_hash_file_stops_between_chunks(tmp_path: Path) -> None:
+    big = tmp_path / "big.bin"
+    big.write_bytes(b"x" * (CHUNK * 3))
+    stop = threading.Event()
+    assert hash_file(big, stop)[1] == CHUNK * 3
+    stop.set()
+    with pytest.raises(HashStopped):
+        hash_file(big, stop)
+
+
+@pytest.mark.component
+def test_catalog_close_waits_for_a_statement_holding_the_lock(env: Env) -> None:
+    started, closed = threading.Event(), threading.Event()
+
+    def worker() -> None:
+        with env.cat.lock:
+            started.set()
+            time.sleep(0.2)
+            env.cat.conn.execute("SELECT COUNT(*) FROM files").fetchone()
+            assert not closed.is_set()
+
+    t = threading.Thread(target=worker)
+    t.start()
+    started.wait(5)
+    env.cat.close()
+    closed.set()
+    t.join(5)
+    with pytest.raises(sqlite3.ProgrammingError):
+        env.cat.conn.execute("SELECT 1")

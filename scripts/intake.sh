@@ -24,7 +24,7 @@ while [ $# -gt 0 ]; do
     *) usage ;;
   esac
 done
-case $label in *[!A-Za-z0-9._-]*|"") echo "label may only use letters, digits, . _ -" >&2; exit 2 ;; esac
+case $label in *[!A-Za-z0-9._-]*|[!A-Za-z0-9]*|"") echo "label must start with a letter or digit and use only letters, digits, . _ -" >&2; exit 2 ;; esac
 
 if [ "$(id -u)" -ne 0 ] && [ -z "${DRIVECON_ALLOW_NONROOT:-}" ]; then
   echo "intake.sh needs root (device access, mounting, SMART)" >&2; exit 1

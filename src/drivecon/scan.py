@@ -3,15 +3,18 @@
 from __future__ import annotations
 
 import datetime as dt
+import json
 import os
 import threading
 import time
 from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Any
 
 from drivecon import fault
 from drivecon.catalog import Catalog
+from drivecon.console import CONSOLE, PROGRESS_SECS, Console
 from drivecon.pending import PendingTracker, refresh_pending
 from drivecon.rules import Decision, Rules
 
@@ -54,9 +57,14 @@ class ScanStats:
     included: int = 0
     included_bytes: int = 0
     pending: int = 0
+    pending_bytes: int = 0
     excluded_files: int = 0
     excluded_bytes: int = 0
     errors: int = 0
+    dropped: int = 0  # earlier rows not yet in the backup, now excluded or gone
+    retired: int = 0  # earlier rows already in the backup, now excluded
+    unknown_files: int = 0  # skipped for an extension on no list (unknown = "exclude")
+    unknown_bytes: int = 0
 
 
 UPSERT = """
@@ -92,6 +100,8 @@ class Scanner:
         progress: Callable[[ScanStats], None] | None = None,
         progress_every: int = 1000,
         throttle: float = 0.0,
+        progress_secs: float = PROGRESS_SECS,
+        console: Console = CONSOLE,
     ) -> None:
         self.cat, self.sid, self.root, self.rules, self.tracker = (
             cat,
@@ -103,8 +113,13 @@ class Scanner:
         self.sniffer, self.batch_size = sniffer, batch_size
         self.stop = stop or threading.Event()
         self.progress, self.progress_every, self.throttle = progress, progress_every, throttle
+        self.progress_secs, self.console = progress_secs, console
+        self._last_progress = time.monotonic()
         self.stats = ScanStats()
         self._excluded: dict[tuple[str, str], list[int]] = {}
+        self._kept: set[bytes] = set()  # rel_path_raw of every row written by this scan
+        self._unknown: dict[str, list[Any]] = {}  # ext -> [files, bytes, examples]
+        self._unreadable: list[str] = []  # folders that could not be read this time
         self._uncommitted = 0
         self._now = cat.clock().isoformat()
 
@@ -116,10 +131,12 @@ class Scanner:
         stack: list[list[str]] = [[]]
         while stack and not self.stop.is_set():
             segs = stack.pop()
+            self.console.working_on("scan", "/".join(segs) + "/")
             try:
                 entries = sorted(os.scandir(self.root.joinpath(*segs)), key=lambda e: e.name)
             except OSError as e:
                 self._record_error("/".join(segs) or ".", e)
+                self._unreadable.append("/".join(segs))
                 continue
             subdirs: list[list[str]] = []
             for entry in entries:
@@ -139,9 +156,13 @@ class Scanner:
                         self._file(entry, child)
                 except OSError as e:
                     self._record_error("/".join(child), e)
+                    self._unreadable.append("/".join(child))
             stack.extend(reversed(subdirs))
         with self.cat.lock:
             self._flush_excluded()
+            if not self.stop.is_set():
+                self._reconcile()
+                self._write_unknown()
             refresh_pending(self.cat, self.cat.clock())
             if not self.stop.is_set():
                 self.cat.conn.execute(
@@ -150,15 +171,58 @@ class Scanner:
             self._commit()
         return self.stats
 
+    def _reconcile(self) -> None:
+        """Bring rows from earlier scans in line with this complete one.
+
+        A row this scan did not write is a file that is now excluded (the rules changed)
+        or no longer there. If it never reached the backup (seen, hashed, held, error) it
+        is dropped, so it is neither copied nor waited on. If it is already in the backup
+        and the rules now exclude it, it is kept as history but marked excluded, which
+        ``prune-excluded`` can act on; a backed-up file that has since disappeared from the
+        source is left alone. Rows under a folder that could not be read are not touched.
+        """
+        conn = self.cat.conn
+        rows = conn.execute(
+            "SELECT id, rel_path_raw, size, status, decision FROM files WHERE source_id=?",
+            (self.sid,),
+        ).fetchall()
+        drop: list[tuple[int]] = []
+        retire: list[tuple[str, int]] = []
+        for fid, raw, size, status, decision in rows:
+            raw = bytes(raw)
+            if raw in self._kept:
+                continue
+            rel = os.fsdecode(raw)
+            if any(rel == u or rel.startswith(u + "/") for u in self._unreadable if u):
+                continue
+            if status in ("copied", "duplicate"):
+                d = self.rules.classify(rel, size or 1)
+                if d.action in ("exclude", "junk") and decision != "exclude":
+                    retire.append((d.rule, fid))
+            else:
+                drop.append((fid,))
+        conn.executemany("DELETE FROM files WHERE id=?", drop)
+        conn.executemany("UPDATE files SET decision='exclude', rule_matched=? WHERE id=?", retire)
+        self.stats.dropped, self.stats.retired = len(drop), len(retire)
+
     def _walk_excluded(self, top: list[str], pattern: str) -> None:
         """Count a pruned tree, rescuing only files that a path exception includes."""
         stack = [top]
         while stack and not self.stop.is_set():
             segs = stack.pop()
+            self.console.working_on("scan", "/".join(segs) + "/ (excluded, counting)")
+            self._maybe_progress(False)
             try:
                 entries = sorted(os.scandir(self.root.joinpath(*segs)), key=lambda e: e.name)
             except OSError as e:
-                self._record_error("/".join(segs), e)
+                # Nothing in an excluded tree is copied, so an unreadable folder there (a
+                # root-only system folder) does not matter, unless a path exception could
+                # rescue a file below it.
+                if self.rules.exception_could_be_under(segs):
+                    self._record_error("/".join(segs), e)
+                    self._unreadable.append("/".join(segs))
+                else:
+                    self._count_excluded(top, pattern + " (unreadable)", 0)
                 continue
             for entry in entries:
                 child = [*segs, entry.name]
@@ -198,12 +262,23 @@ class Scanner:
         if d.action in ("include", "pending"):
             self._upsert(rel, st, d, mime)
         else:
+            if d.rule.startswith("unknown:"):
+                self._note_unknown(d.ext, rel, st.st_size)
             self._count_excluded(segs[:-1], d.rule, st.st_size)
-        if self.progress and self.stats.files_seen % self.progress_every == 0:
+        self._maybe_progress(self.stats.files_seen % self.progress_every == 0)
+
+    def _maybe_progress(self, due: bool) -> None:
+        """Report every ``progress_every`` files, and at least every ``progress_secs``."""
+        if not self.progress:
+            return
+        now = time.monotonic()
+        if due or now - self._last_progress >= self.progress_secs:
+            self._last_progress = now
             self.progress(self.stats)
 
     def _upsert(self, rel: str, st: os.stat_result, d: Decision, mime: str) -> None:
         pending = d.action == "pending"
+        self._kept.add(os.fsencode(rel))
         with self.cat.lock:
             self.cat.conn.execute(
                 UPSERT,
@@ -218,6 +293,7 @@ class Scanner:
                 self._commit()
         if pending:
             self.stats.pending += 1
+            self.stats.pending_bytes += st.st_size
             self.tracker.add(d.ext, rel, st.st_size)
         else:
             self.stats.included += 1
@@ -225,6 +301,7 @@ class Scanner:
 
     def _record_error(self, rel: str, err: OSError) -> None:
         self.stats.errors += 1
+        self._kept.add(os.fsencode(rel))
         with self.cat.lock:
             self.cat.conn.execute(
                 UPSERT,
@@ -232,6 +309,25 @@ class Scanner:
                  None, None, None, "", None, "error", "read-error", "error", str(err), self._now),
             )  # fmt: skip
             self._uncommitted += 1
+
+    def _note_unknown(self, ext: str, rel: str, size: int) -> None:
+        slot = self._unknown.setdefault(ext, [0, 0, []])
+        slot[0] += 1
+        slot[1] += size
+        if len(slot[2]) < 3:
+            slot[2].append(rel)
+        self.stats.unknown_files += 1
+        self.stats.unknown_bytes += size
+
+    def _write_unknown(self) -> None:
+        """The unknown extensions this complete scan skipped, for `report unknown`."""
+        conn = self.cat.conn
+        conn.execute("DELETE FROM unknown_extensions WHERE source_id=?", (self.sid,))
+        conn.executemany(
+            "INSERT INTO unknown_extensions (source_id, ext, file_count, total_bytes,"
+            " example_paths) VALUES (?,?,?,?,?)",
+            [(self.sid, ext, n, b, json.dumps(ex)) for ext, (n, b, ex) in self._unknown.items()],
+        )
 
     def _count_excluded(self, dir_segs: list[str], rule: str, size: int) -> None:
         key = ("/".join(dir_segs), rule)

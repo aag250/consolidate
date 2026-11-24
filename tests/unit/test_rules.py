@@ -27,7 +27,7 @@ CONFIG = Path(__file__).parent.parent.parent / "config"
         ("Users/u1/Pictures/Thumbs.db", "junk", "name:Thumbs.db"),
         ("Users/u1/Documents/~$report.docx", "junk", "name:~$*"),
         ("Users/u1/Documents/app.exe", "exclude", "exe"),
-        ("Users/u1/Documents/data.weird", "pending", "unknown:weird"),
+        ("Users/u1/Documents/data.weird", "exclude", "unknown:weird"),  # unknown = "exclude"
         ("Users/u1/Documents/README", "sniff", "no-extension"),
         ("proj/node_modules/pkg/readme.txt", "exclude", "**/node_modules/"),
         ("Dev/notes.txt", "include", "txt"),  # Linux rules must not hit a Windows drive
@@ -124,3 +124,21 @@ def test_decision_matches_mime_type_in_any_case(rules: Rules) -> None:
         "decided:mime:application/vnd.hp-hpgl",
     )
     assert rules.resolve_ext("mime:application/VND.HP-HPGL").action == "exclude"
+
+
+@pytest.mark.unit
+def test_unknown_extensions_are_held_in_ask_mode_and_skipped_in_exclude_mode() -> None:
+    from dataclasses import replace
+
+    from drivecon.config import load_path_rules
+
+    ft = load_file_types(CONFIG / "file-types.toml")
+    pr = load_path_rules(CONFIG / "paths.toml")
+    ask = Rules(replace(ft, unknown="ask"), pr)
+    skip = Rules(replace(ft, unknown="exclude"), pr)
+    path = "Users/u1/Documents/data.weird"
+    assert (ask.classify(path, 5).action, skip.classify(path, 5).action) == ("pending", "exclude")
+    assert skip.resolve_ext("mime:application/x-odd").rule == "unknown:mime:application/x-odd"
+    assert (
+        skip.classify("Users/u1/Documents/a.docx", 5).action == "include"
+    )  # known types unchanged

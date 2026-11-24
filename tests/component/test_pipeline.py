@@ -8,6 +8,7 @@ from typing import Any
 
 import pytest
 
+from drivecon import copier
 from drivecon.catalog import Catalog
 from drivecon.config import load_file_types, load_path_rules
 from drivecon.copier import (
@@ -235,6 +236,35 @@ def test_destination_full_stops_cleanly_and_resumes(
 
 
 @pytest.mark.component
+def test_destination_full_while_staging_keeps_the_files_already_staged(
+    lab: Lab, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    sid, root = lab.add(
+        "A", [{"path": f"docs/f{i}.docx", "key": str(i), "size": 20} for i in range(4)]
+    )
+    Scanner(lab.cat, sid, root, lab.rules, PendingTracker()).run()
+    w = HashWorker(lab.cat, sid, root)
+    w.scan_done.set()
+    w.run()
+    real = copier._write_tmp
+    calls = {"n": 0}
+
+    def full_on_third(src: Path, final: Path, expected: str) -> tuple[Path, int]:
+        calls["n"] += 1
+        if calls["n"] == 3:
+            raise DestinationFull(str(final))
+        return real(src, final, expected)
+
+    monkeypatch.setattr(copier, "_write_tmp", full_on_third)
+    with pytest.raises(DestinationFull):  # all four fall in one batch
+        copy_source(lab.cat, sid, root, Placer(lab.cat, lab.pr), lab.dest)
+    assert len(lab.tree()) == 2 and not list((lab.dest / "Files").rglob(".dc-*"))
+    monkeypatch.undo()
+    stats = copy_source(lab.cat, sid, root, Placer(lab.cat, lab.pr), lab.dest)
+    assert stats.copied == 2 and len(lab.tree()) == 4
+
+
+@pytest.mark.component
 def test_copy_blob_never_leaves_a_partial_file_under_the_final_name(tmp_path: Path) -> None:
     src = tmp_path / "s.bin"
     src.write_bytes(b"x" * 1000)
@@ -306,3 +336,87 @@ def test_hash_worker_runs_alongside_the_scan(lab: Lab) -> None:
         30,
     )
     shutil.rmtree(root)  # nothing else needed from the source for the check above
+
+
+@pytest.mark.component
+def test_a_profile_copied_into_any_folder_merges_with_the_users_profile(lab: Lab) -> None:
+    s1, r1 = lab.add("PC", [
+        {"path": "Users/kel/Documents/taxes/w2.pdf", "content": "w2"},
+        {"path": "Users/kel/Desktop/list.txt", "content": "list"},
+    ])  # fmt: skip
+    lab.process(s1, r1)
+    s2, r2 = lab.add("SSD", [
+        {"path": "KG 10.23.21 Backup/Documents/taxes/w2.pdf", "content": "w2"},
+        {"path": "KG 10.23.21 Backup/Documents/taxes/1099.pdf", "content": "1099"},
+        {"path": "KG 10.23.21 Backup/Desktop/new.txt", "content": "new"},
+        {"path": "KG 10.23.21 Backup/Downloads/form.pdf", "content": "form"},
+        {"path": "KG 10.23.21 Backup/Favorites/desktop.ini", "content": "junk"},
+        {"path": "Projects/site/Documents/spec.txt", "content": "spec"},
+        {"path": "Projects/site/Pictures/logo.txt", "content": "logo"},
+    ])  # fmt: skip
+    stats = lab.process(s2, r2)
+    assert (stats.copied, stats.duplicates) == (5, 1)
+    tree = lab.tree()
+    assert {"Files/taxes/1099.pdf", "Files/Desktop/new.txt", "Files/Downloads/form.pdf"} <= set(
+        tree
+    )
+    assert "Files/Projects/site/Documents/spec.txt" in tree  # two profile folders: left as is
+    assert not [t for t in tree if "KG 10.23.21 Backup" in t]
+
+
+def _rules_excluding(lab: Lab, pattern: str) -> Rules:
+    cfg = lab.tmp / "cfg-prune"
+    cfg.mkdir(exist_ok=True)
+    text = (ROOT / "config" / "paths.toml").read_text()
+    text += f'\n[[exclusion]]\nscope = "test"\nos = "any"\npatterns = ["{pattern}"]\n'
+    (cfg / "paths.toml").write_text(text)
+    return Rules(
+        load_file_types(ROOT / "config" / "file-types.toml"), load_path_rules(cfg / "paths.toml")
+    )
+
+
+def _backed_up_then_excluded(lab: Lab) -> Path:
+    sid, root = lab.add("A", [
+        {"path": "Users/u/Documents/keep.docx", "content": "keep"},
+        {"path": "Tools/sample/a.docx", "content": "a"},
+        {"path": "Tools/sample/sub/b.docx", "content": "b"},
+        {"path": "Tools/sample/shared.docx", "content": "keep"},  # same content as keep.docx
+    ])  # fmt: skip
+    lab.process(sid, root)
+    assert {"Files/Tools/sample/a.docx", "Files/Tools/sample/sub/b.docx"} <= set(lab.tree())
+    lab.rules = _rules_excluding(lab, "Tools/")
+    assert Scanner(lab.cat, sid, root, lab.rules, PendingTracker()).run().retired == 3
+    lab.cat.commit()
+    return root
+
+
+@pytest.mark.component
+def test_prune_removes_only_files_excluded_everywhere_and_empty_folders(lab: Lab) -> None:
+    from drivecon.prune import find_candidates, prune
+
+    _backed_up_then_excluded(lab)
+    cands = find_candidates(lab.cat)
+    assert sorted(c.dest_path for c in cands) == [
+        "Files/Tools/sample/a.docx",
+        "Files/Tools/sample/sub/b.docx",
+    ]
+    res = prune(lab.cat, lab.dest, cands)
+    assert (res.removed, res.missing, res.mismatched) == (2, 0, [])
+    # The content also kept as keep.docx stays, at the path it was first placed at.
+    (left,) = lab.tree()
+    assert (lab.dest / left).read_bytes() == b"keep"
+    assert not (lab.dest / "Files" / "Tools" / "sample" / "sub").exists()  # emptied folder removed
+    assert lab.cat.conn.execute("SELECT COUNT(*) FROM blobs").fetchone() == (1,)
+    assert verify(lab.cat, lab.dest, NOW).ok
+    assert find_candidates(lab.cat) == []
+
+
+@pytest.mark.component
+def test_prune_leaves_a_file_whose_content_no_longer_matches(lab: Lab) -> None:
+    from drivecon.prune import find_candidates, prune
+
+    _backed_up_then_excluded(lab)
+    (lab.dest / "Files/Tools/sample/a.docx").write_bytes(b"edited by hand")
+    res = prune(lab.cat, lab.dest, find_candidates(lab.cat))
+    assert res.removed == 1 and res.mismatched == ["Files/Tools/sample/a.docx"]
+    assert (lab.dest / "Files/Tools/sample/a.docx").read_bytes() == b"edited by hand"

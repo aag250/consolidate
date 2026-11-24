@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import csv
 import datetime as dt
+import json
 import os
 import re
 from dataclasses import dataclass, field
@@ -47,7 +48,11 @@ def summarize(cat: Catalog, source_id: int) -> SourceSummary:
     ).fetchone()
     s = SourceSummary(label, last_scan is not None)
     counts = dict(
-        q("SELECT status, COUNT(*) FROM files WHERE source_id=? GROUP BY status", (source_id,))
+        q(
+            "SELECT status, COUNT(*) FROM files WHERE source_id=?"
+            " AND decision IS NOT 'exclude' GROUP BY status",
+            (source_id,),
+        )
     )
     s.included = sum(counts.values())
     s.excluded = q(
@@ -59,7 +64,8 @@ def summarize(cat: Catalog, source_id: int) -> SourceSummary:
     s.errors = counts.get("error", 0)
     s.unfinished = counts.get("seen", 0) + counts.get("hashed", 0)
     s.new_bytes = q(
-        "SELECT COALESCE(SUM(size),0) FROM files WHERE source_id=? AND status='copied'",
+        "SELECT COALESCE(SUM(size),0) FROM files WHERE source_id=? AND status='copied'"
+        " AND decision IS NOT 'exclude'",
         (source_id,),
     ).fetchone()[0]
     unverified = q(
@@ -175,6 +181,20 @@ def error_rows(cat: Catalog) -> list[tuple[object, ...]]:
     ).fetchall()
 
 
+def unknown_rows(cat: Catalog, label: str | None = None) -> list[tuple[str, str, int, int, str]]:
+    """Extensions on no list that scans skipped: (drive, ext, files, bytes, examples)."""
+    q = (
+        "SELECT s.label, u.ext, u.file_count, u.total_bytes, u.example_paths"
+        " FROM unknown_extensions u JOIN sources s ON s.id = u.source_id"
+    )
+    args: tuple[str, ...] = ()
+    if label:
+        q += " WHERE s.label=?"
+        args = (label,)
+    rows = cat.conn.execute(q + " ORDER BY u.total_bytes DESC, u.ext", args).fetchall()
+    return [(d, e, n, b, " | ".join(json.loads(x or "[]"))) for d, e, n, b, x in rows]
+
+
 def write_reports(cat: Catalog, dest: Path) -> None:
     """Refresh _reports/ (conflicts, renamed paths, read errors)."""
     out = dest / "_reports"
@@ -185,3 +205,5 @@ def write_reports(cat: Catalog, dest: Path) -> None:
     )
     _write_csv(out / "errors.csv", ["drive", "path", "error"], error_rows(cat))
     _write_csv(out / "versions.csv", CSV_HEADER, csv_rows(find_version_groups(cat)))
+    _write_csv(out / "unknown-excluded.csv", ["drive", "extension", "files", "bytes", "examples"],
+               list[tuple[object, ...]](unknown_rows(cat)))  # fmt: skip

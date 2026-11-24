@@ -19,3 +19,11 @@ def rules() -> Rules:
         load_path_rules(CONFIG / "paths.toml"),
         os_kind="windows",
     )
+
+
+def use_ask_mode(config_dir: Path) -> None:
+    """Switch a copied config to unknown = "ask", for tests of the held-and-prompt flow."""
+    p = config_dir / "file-types.toml"
+    text = p.read_text()
+    assert 'unknown = "exclude"' in text
+    p.write_text(text.replace('unknown = "exclude"', 'unknown = "ask"', 1))

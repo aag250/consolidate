@@ -93,3 +93,17 @@ def test_cli_source_dir_mock(tmp_path: Path) -> None:
     )
     assert res.exit_code == 0
     assert "not available" in (tmp_path / "d" / "_intake" / "M1.txt").read_text()
+
+
+@pytest.mark.component
+def test_source_label_prints_the_registered_label_or_nothing(tmp_path: Path) -> None:
+    src = tmp_path / "share"
+    src.mkdir()
+    runner = CliRunner()
+    common = ["--dest", str(tmp_path / "dest")]
+    res = runner.invoke(app, ["intake", "--label", "Share-1", "--source-dir", str(src), *common])
+    assert res.exit_code == 0, res.output
+    known = runner.invoke(app, ["source-label", "--uuid", "dir-Share-1", *common])
+    assert (known.exit_code, known.output) == (0, "Share-1\n")
+    new = runner.invoke(app, ["source-label", "--uuid", "1234-ABCD", *common])
+    assert (new.exit_code, new.output) == (0, "")

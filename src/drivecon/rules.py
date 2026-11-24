@@ -76,6 +76,7 @@ class Rules:
         self._os = os_kind
         self._pr = path_rules
         self._ext: dict[str, tuple[str, str]] = {}  # ext -> (decision, rule)
+        self.unknown = file_types.unknown  # ask | exclude
         self._patterns: list[tuple[re.Pattern[str], str, str]] = []
         for cat in file_types.categories:
             for e in cat.extensions:
@@ -108,12 +109,33 @@ class Rules:
                     return pat
         return None
 
+    def exception_could_be_under(self, segs: list[str]) -> bool:
+        """Whether a path exception could rescue a file somewhere below folder ``segs``."""
+        for pat in self._pr.exceptions:
+            p = split_path(pat)
+            if "**" in p:
+                # "**/AppData/.../*.pst" can only rescue below a folder already inside an
+                # AppData: an excluded tree is pruned at or under the folder it names.
+                anchor = next((x for x in p if x != "**"), "")
+                if any(_seg_match(anchor, seg, self._ci) for seg in segs):
+                    return True
+                continue
+            if len(p) > len(segs) and match_segments(p[: len(segs)], segs, self._ci, whole=True):
+                return True
+        return False
+
     def resolve_ext(self, ext: str, rule_prefix: str = "") -> Decision:
         """Decide by extension alone (used for sniffed files)."""
         ftype = self.file_type(ext)
         if ftype is None:
-            return Decision("pending", f"unknown:{ext}", ext)
+            return self._unknown(ext)
         return Decision(ftype[0], rule_prefix + ftype[1], ext)  # type: ignore[arg-type]
+
+    def _unknown(self, ext: str) -> Decision:
+        """An extension on no list: held for a prompt, or skipped and listed at the end."""
+        return Decision(
+            "exclude" if self.unknown == "exclude" else "pending", f"unknown:{ext}", ext
+        )
 
     def classify(self, path: str, size: int) -> Decision:
         segs = split_path(path)
@@ -147,5 +169,5 @@ class Rules:
         if not ext:
             return Decision("sniff", "no-extension")
         if ftype is None:
-            return Decision("pending", f"unknown:{ext}", ext)
+            return self._unknown(ext)
         return Decision(ftype[0], ftype[1], ext)  # type: ignore[arg-type]

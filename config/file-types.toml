@@ -1,8 +1,13 @@
 # File type decisions. Extensions match case-insensitively.
 # Rules apply in order, first match wins: path exceptions, path exclusions,
 # junk-file rules (paths.toml), then these file types.
-# An extension on no list is held as pending_decision and prompted for; answers
-# are written to the [[decided]] tables at the bottom of this file.
+# An extension on no list is handled by `unknown` below:
+#   "exclude"  skip it, and list what was skipped at the end of each run, in
+#              `report unknown` and in _reports/unknown-excluded.csv; keep one later
+#              with `drivecon include-ext .EXT` and re-run that drive.
+#   "ask"      hold it as pending_decision and prompt for it; answers are written to
+#              the [[decided]] tables at the bottom of this file.
+unknown = "exclude"
 
 [[category]]
 name = "Word processing"
@@ -660,3 +665,2943 @@ ext = "tvt"
 decision = "exclude"
 date = "2026-11-22"
 example = "swtools/readyapps/rnr/Z934ZAB1011US00.TVT"
+[[decided]]
+ext = "efi"
+decision = "exclude"
+date = "2026-11-22"
+example = "bootmgr.efi"
+[[decided]]
+ext = "xsl"
+decision = "exclude"
+date = "2026-11-22"
+example = "sources/appcompat.xsl"
+[[decided]]
+ext = "mof"
+decision = "exclude"
+date = "2026-11-22"
+example = "sources/cdplib.mof"
+[[decided]]
+ext = "sdb"
+decision = "exclude"
+date = "2026-11-22"
+example = "sources/drvmain.sdb"
+[[decided]]
+ext = "clg"
+decision = "exclude"
+date = "2026-11-22"
+example = "sources/install_Windows 7 PROFESSIONAL.clg"
+[[decided]]
+ext = "nls"
+decision = "exclude"
+date = "2026-11-22"
+example = "sources/locale.nls"
+[[decided]]
+ext = "xrm-ms"
+decision = "exclude"
+date = "2026-11-22"
+example = "sources/pkeyconfig.xrm-ms"
+[[decided]]
+ext = "xsd"
+decision = "exclude"
+date = "2026-11-22"
+example = "sources/wcmtypes.xsd"
+[[decided]]
+ext = "man"
+decision = "exclude"
+date = "2026-11-22"
+example = "sources/dlmanifests/accessibilitycpl-dl.man"
+[[decided]]
+ext = "vbs"
+decision = "exclude"
+date = "2026-11-22"
+example = "sources/etwproviders/etwproviderinstall.vbs"
+[[decided]]
+ext = "cmd"
+decision = "exclude"
+date = "2026-11-22"
+example = "support/migwiz/installsvrmig.cmd"
+[[decided]]
+ext = "flg"
+decision = "exclude"
+date = "2026-11-22"
+example = "oobedone.flg"
+[[decided]]
+ext = "sdr"
+decision = "exclude"
+date = "2026-11-22"
+example = "dell.sdr"
+[[decided]]
+ext = "lic"
+decision = "exclude"
+date = "2026-11-22"
+example = ".Xilinx/Xilinx (2).lic"
+[[decided]]
+ext = "pdb"
+decision = "exclude"
+date = "2026-11-22"
+example = "AC_SWM/AC_SWM.pdb"
+[[decided]]
+ext = "mst"
+decision = "exclude"
+date = "2026-11-22"
+example = "Apps/N2DPW/1028.mst"
+[[decided]]
+ext = "md5"
+decision = "exclude"
+date = "2026-11-22"
+example = "Apps/N2DPW/Cyberlink.MD5"
+[[decided]]
+ext = "isn"
+decision = "exclude"
+date = "2026-11-22"
+example = "Apps/N2DPW/setup.isn"
+[[decided]]
+ext = "bld"
+decision = "exclude"
+date = "2026-11-22"
+example = "Apps/h3gfn/Installer/HISTORY.BLD"
+[[decided]]
+ext = "dcf"
+decision = "exclude"
+date = "2026-11-22"
+example = "Apps/h3gfn/Installer/Setup.dcf"
+[[decided]]
+ext = "rxc"
+decision = "exclude"
+date = "2026-11-22"
+example = "Apps/h3gfn/Installer/ACTIVATION_300/NActReq4.rxc"
+[[decided]]
+ext = "chs"
+decision = "exclude"
+date = "2026-11-22"
+example = "Apps/h3gfn/Installer/BIN/UEIP.CHS"
+[[decided]]
+ext = "cht"
+decision = "exclude"
+date = "2026-11-22"
+example = "Apps/h3gfn/Installer/BIN/UEIP.CHT"
+[[decided]]
+ext = "deu"
+decision = "exclude"
+date = "2026-11-22"
+example = "Apps/h3gfn/Installer/BIN/UEIP.DEU"
+[[decided]]
+ext = "enu"
+decision = "exclude"
+date = "2026-11-22"
+example = "Apps/h3gfn/Installer/BIN/UEIP.ENU"
+[[decided]]
+ext = "esn"
+decision = "exclude"
+date = "2026-11-22"
+example = "Apps/h3gfn/Installer/BIN/UEIP.ESN"
+[[decided]]
+ext = "fra"
+decision = "exclude"
+date = "2026-11-22"
+example = "Apps/h3gfn/Installer/BIN/UEIP.FRA"
+[[decided]]
+ext = "ita"
+decision = "exclude"
+date = "2026-11-22"
+example = "Apps/h3gfn/Installer/BIN/UEIP.ITA"
+[[decided]]
+ext = "jpn"
+decision = "exclude"
+date = "2026-11-22"
+example = "Apps/h3gfn/Installer/BIN/UEIP.JPN"
+[[decided]]
+ext = "kor"
+decision = "exclude"
+date = "2026-11-22"
+example = "Apps/h3gfn/Installer/BIN/UEIP.KOR"
+[[decided]]
+ext = "nld"
+decision = "exclude"
+date = "2026-11-22"
+example = "Apps/h3gfn/Installer/BIN/UEIP.NLD"
+[[decided]]
+ext = "ptb"
+decision = "exclude"
+date = "2026-11-22"
+example = "Apps/h3gfn/Installer/BIN/UEIP.PTB"
+[[decided]]
+ext = "ibt"
+decision = "exclude"
+date = "2026-11-22"
+example = "Apps/wgwt7/setup.ibt"
+[[decided]]
+ext = "skin"
+decision = "exclude"
+date = "2026-11-22"
+example = "Apps/wgwt7/setup.skin"
+[[decided]]
+ext = "ax"
+decision = "exclude"
+date = "2026-11-22"
+example = "Apps/wgwt7/CTShared/Shared/CTFrFix.ax"
+[[decided]]
+ext = "skn"
+decision = "exclude"
+date = "2026-11-22"
+example = "Apps/wgwt7/DWCentral/setup.skn"
+[[decided]]
+ext = "cfc"
+decision = "exclude"
+date = "2026-11-22"
+example = "CW Decoder/CWDecode.cfc"
+[[decided]]
+ext = "bpl"
+decision = "exclude"
+date = "2026-11-22"
+example = "CW Decoder/ZylTimerPack.bpl"
+[[decided]]
+ext = "tcl"
+decision = "exclude"
+date = "2026-11-22"
+example = "OrCAD/OrCAD_16.3_Demo/OpenAccess/bin/win32/opt/pkgIndex.tcl"
+[[decided]]
+ext = "plg"
+decision = "exclude"
+date = "2026-11-22"
+example = "OrCAD/OrCAD_16.3_Demo/OpenAccess/data/plugins/oaCMExportSample.plg"
+[[decided]]
+ext = "lib"
+decision = "exclude"
+date = "2026-11-22"
+example = "OrCAD/OrCAD_16.3_Demo/OpenAccess/lib/win32/opt/cmLicense.lib"
+[[decided]]
+ext = "mime:text/x-shellscript"
+decision = "exclude"
+date = "2026-11-22"
+example = "OrCAD/OrCAD_16.3_Demo/bin/cds_plat"
+[[decided]]
+ext = "tgf"
+decision = "exclude"
+date = "2026-11-22"
+example = "OrCAD/OrCAD_16.3_Demo/doc/acns/acns.tgf"
+[[decided]]
+ext = "z"
+decision = "exclude"
+date = "2026-11-22"
+example = "OrCAD/OrCAD_16.3_Demo/doc/aleg_spec_tut/examples/aleg_spec_tut_db.t.Z"
+[[decided]]
+ext = "brd"
+decision = "exclude"
+date = "2026-11-22"
+example = "OrCAD/OrCAD_16.3_Demo/doc/algrotutorial/examples/cds_routed.brd"
+[[decided]]
+ext = "cfs"
+decision = "exclude"
+date = "2026-11-22"
+example = "OrCAD/OrCAD_16.3_Demo/doc/docindex/7c2f879b3da148dc39fca1d567dfc7fc/_ko2.cfs"
+[[decided]]
+ext = "mime:application/x-dosdriver"
+decision = "exclude"
+date = "2026-11-22"
+example = "OrCAD/OrCAD_16.3_Demo/doc/docindex/7c2f879b3da148dc39fca1d567dfc7fc/segments"
+[[decided]]
+ext = "fnd"
+decision = "exclude"
+date = "2026-11-22"
+example = "OrCAD/OrCAD_16.3_Demo/doc/finder/SKILL/Cadence_Infrastructure/caiuser.fnd"
+[[decided]]
+ext = "lbr"
+decision = "exclude"
+date = "2026-11-22"
+example = "OrCAD/OrCAD_16.3_Demo/doc/xmlreg/library.lbr"
+[[decided]]
+ext = "ad"
+decision = "exclude"
+date = "2026-11-22"
+example = "OrCAD/OrCAD_16.3_Demo/share/app-defaults/Allegro.ad"
+[[decided]]
+ext = "sample"
+decision = "exclude"
+date = "2026-11-22"
+example = "OrCAD/OrCAD_16.3_Demo/share/cdssetup/cdsinfo.tag.sample"
+[[decided]]
+ext = "paf"
+decision = "exclude"
+date = "2026-11-22"
+example = "OrCAD/OrCAD_16.3_Demo/share/cdssetup/cdsprop.paf"
+[[decided]]
+ext = "tmf"
+decision = "exclude"
+date = "2026-11-22"
+example = "OrCAD/OrCAD_16.3_Demo/share/cdssetup/cdsprop.tmf"
+[[decided]]
+ext = "loc"
+decision = "exclude"
+date = "2026-11-22"
+example = "OrCAD/OrCAD_16.3_Demo/share/cdssetup/setup.loc"
+[[decided]]
+ext = "tsg"
+decision = "exclude"
+date = "2026-11-22"
+example = "OrCAD/OrCAD_16.3_Demo/share/cdssetup/concept/genview/template.tsg"
+[[decided]]
+ext = "env"
+decision = "exclude"
+date = "2026-11-22"
+example = "OrCAD/OrCAD_16.3_Demo/share/cdssetup/hierEditor/env/hierEditorReg.env"
+[[decided]]
+ext = "panel"
+decision = "exclude"
+date = "2026-11-22"
+example = "OrCAD/OrCAD_16.3_Demo/share/cdssetup/lman/AboutDialog.panel"
+[[decided]]
+ext = "cpm"
+decision = "exclude"
+date = "2026-11-22"
+example = "OrCAD/OrCAD_16.3_Demo/share/cdssetup/lman/browser.cpm"
+[[decided]]
+ext = "mesg"
+decision = "exclude"
+date = "2026-11-22"
+example = "OrCAD/OrCAD_16.3_Demo/share/cdssetup/lman/cds_pcblw.mesg"
+[[decided]]
+ext = "options"
+decision = "exclude"
+date = "2026-11-22"
+example = "OrCAD/OrCAD_16.3_Demo/share/cdssetup/lman/commandline.options"
+[[decided]]
+ext = "validation"
+decision = "exclude"
+date = "2026-11-22"
+example = "OrCAD/OrCAD_16.3_Demo/share/cdssetup/lman/fieldlevel.validation"
+[[decided]]
+ext = "prf"
+decision = "exclude"
+date = "2026-11-22"
+example = "OrCAD/OrCAD_16.3_Demo/share/cdssetup/lman/importApdDieText.prf"
+[[decided]]
+ext = "tip"
+decision = "exclude"
+date = "2026-11-22"
+example = "OrCAD/OrCAD_16.3_Demo/share/cdssetup/lman/pdvtips.tip"
+[[decided]]
+ext = "prop"
+decision = "exclude"
+date = "2026-11-22"
+example = "OrCAD/OrCAD_16.3_Demo/share/cdssetup/lman/propfile.prop"
+[[decided]]
+ext = "5x"
+decision = "exclude"
+date = "2026-11-22"
+example = "OrCAD/OrCAD_16.3_Demo/share/cdssetup/lman/viewtype.5x"
+[[decided]]
+ext = "cnv"
+decision = "exclude"
+date = "2026-11-22"
+example = "OrCAD/OrCAD_16.3_Demo/share/cdssetup/lman/intlfiles/locales/ibm-0037.cnv"
+[[decided]]
+ext = "idx"
+decision = "exclude"
+date = "2026-11-22"
+example = "OrCAD/OrCAD_16.3_Demo/share/cdssetup/registry/data/fet.idx"
+[[decided]]
+ext = "cnt"
+decision = "exclude"
+date = "2026-11-22"
+example = "OrCAD/OrCAD_16.3_Demo/share/fet/help/support.cnt"
+[[decided]]
+ext = "hlp"
+decision = "exclude"
+date = "2026-11-22"
+example = "OrCAD/OrCAD_16.3_Demo/share/fet/help/support.hlp"
+[[decided]]
+ext = "ident"
+decision = "exclude"
+date = "2026-11-22"
+example = "OrCAD/OrCAD_16.3_Demo/share/java/COM/cadence/openbook/javaPI.ident"
+[[decided]]
+ext = "ilinit"
+decision = "exclude"
+date = "2026-11-22"
+example = "OrCAD/OrCAD_16.3_Demo/share/local/pcb/skill/example.ilinit"
+[[decided]]
+ext = "arl"
+decision = "exclude"
+date = "2026-11-22"
+example = "OrCAD/OrCAD_16.3_Demo/share/pcb/assembly/component_clearance_audit.arl"
+[[decided]]
+ext = "rle"
+decision = "exclude"
+date = "2026-11-22"
+example = "OrCAD/OrCAD_16.3_Demo/share/pcb/assembly/component_clearance_audit.rle"
+[[decided]]
+ext = "par"
+decision = "exclude"
+date = "2026-11-22"
+example = "OrCAD/OrCAD_16.3_Demo/share/pcb/assembly/dfa_constraints.par"
+[[decided]]
+ext = "l"
+decision = "exclude"
+date = "2026-11-22"
+example = "OrCAD/OrCAD_16.3_Demo/share/pcb/consmgr/cmdict.l"
+[[decided]]
+ext = "mcf"
+decision = "exclude"
+date = "2026-11-22"
+example = "OrCAD/OrCAD_16.3_Demo/share/pcb/consmgr/consmgr.mcf"
+[[decided]]
+ext = "aux"
+decision = "exclude"
+date = "2026-11-22"
+example = "OrCAD/OrCAD_16.3_Demo/share/pcb/etc/context/acns.aux"
+[[decided]]
+ext = "cxt"
+decision = "exclude"
+date = "2026-11-22"
+example = "OrCAD/OrCAD_16.3_Demo/share/pcb/etc/context/acns.cxt"
+[[decided]]
+ext = "toc"
+decision = "exclude"
+date = "2026-11-22"
+example = "OrCAD/OrCAD_16.3_Demo/share/pcb/etc/context/acns.toc"
+[[decided]]
+ext = "pcd"
+decision = "exclude"
+date = "2026-11-22"
+example = "OrCAD/OrCAD_16.3_Demo/share/pcb/etc/context/allegro.pcd"
+[[decided]]
+ext = "pad"
+decision = "exclude"
+date = "2026-11-22"
+example = "OrCAD/OrCAD_16.3_Demo/share/pcb/examples/board_design/symbols/60c85c35d.pad"
+[[decided]]
+ext = "dra"
+decision = "exclude"
+date = "2026-11-22"
+example = "OrCAD/OrCAD_16.3_Demo/share/pcb/examples/board_design/symbols/asizeh.dra"
+[[decided]]
+ext = "osm"
+decision = "exclude"
+date = "2026-11-22"
+example = "OrCAD/OrCAD_16.3_Demo/share/pcb/examples/board_design/symbols/asizeh.osm"
+[[decided]]
+ext = "psm"
+decision = "exclude"
+date = "2026-11-22"
+example = "OrCAD/OrCAD_16.3_Demo/share/pcb/examples/board_design/symbols/cap400.psm"
+[[decided]]
+ext = "bsm"
+decision = "exclude"
+date = "2026-11-22"
+example = "OrCAD/OrCAD_16.3_Demo/share/pcb/examples/board_design/symbols/outline.bsm"
+[[decided]]
+ext = "fsm"
+decision = "exclude"
+date = "2026-11-22"
+example = "OrCAD/OrCAD_16.3_Demo/share/pcb/examples/board_design/symbols/tr150.fsm"
+[[decided]]
+ext = "il"
+decision = "exclude"
+date = "2026-11-22"
+example = "OrCAD/OrCAD_16.3_Demo/share/pcb/examples/skill/disclaimer.il"
+[[decided]]
+ext = "perm"
+decision = "exclude"
+date = "2026-11-22"
+example = "OrCAD/OrCAD_16.3_Demo/share/pcb/examples/skill/DOC/NO.perm"
+[[decided]]
+ext = "form"
+decision = "exclude"
+date = "2026-11-22"
+example = "OrCAD/OrCAD_16.3_Demo/share/pcb/examples/skill/ash/swap_component.form"
+[[decided]]
+ext = "mime:text/x-makefile"
+decision = "include"
+date = "2026-11-22"
+example = "OrCAD/OrCAD_16.3_Demo/share/pcb/examples/skill/plugin/Makefile"
+[[decided]]
+ext = "vcproj"
+decision = "exclude"
+date = "2026-11-22"
+example = "OrCAD/OrCAD_16.3_Demo/share/pcb/examples/skill/plugin/axldll.vcproj"
+[[decided]]
+ext = "orig"
+decision = "exclude"
+date = "2026-11-22"
+example = "OrCAD/OrCAD_16.3_Demo/share/pcb/pcb_lib/symbols/bondpad_wbd.pad.orig"
+[[decided]]
+ext = "ssm"
+decision = "exclude"
+date = "2026-11-22"
+example = "OrCAD/OrCAD_16.3_Demo/share/pcb/pcb_lib/symbols/sha_sot89.ssm"
+[[decided]]
+ext = "mod"
+decision = "exclude"
+date = "2026-11-22"
+example = "OrCAD/OrCAD_16.3_Demo/share/pcb/pvt/ven_inc/mpi.mod"
+[[decided]]
+ext = "verify"
+decision = "exclude"
+date = "2026-11-22"
+example = "OrCAD/OrCAD_16.3_Demo/share/pcb/signal/emc/rule_src/emc_bypass.arl.verify"
+[[decided]]
+ext = "def"
+decision = "exclude"
+date = "2026-11-22"
+example = "OrCAD/OrCAD_16.3_Demo/share/pcb/text/adslayers.def"
+[[decided]]
+ext = "strokes"
+decision = "exclude"
+date = "2026-11-22"
+example = "OrCAD/OrCAD_16.3_Demo/share/pcb/text/allegro.strokes"
+[[decided]]
+ext = "col"
+decision = "exclude"
+date = "2026-11-22"
+example = "OrCAD/OrCAD_16.3_Demo/share/pcb/text/allegro_192.col"
+[[decided]]
+ext = "mime:application/javascript"
+decision = "exclude"
+date = "2026-11-22"
+example = "OrCAD/OrCAD_16.3_Demo/share/pcb/text/env"
+[[decided]]
+ext = "thick"
+decision = "exclude"
+date = "2026-11-22"
+example = "OrCAD/OrCAD_16.3_Demo/share/pcb/text/film_res.thick"
+[[decided]]
+ext = "thin"
+decision = "exclude"
+date = "2026-11-22"
+example = "OrCAD/OrCAD_16.3_Demo/share/pcb/text/film_res.thin"
+[[decided]]
+ext = "men"
+decision = "exclude"
+date = "2026-11-22"
+example = "OrCAD/OrCAD_16.3_Demo/share/pcb/text/cuimenus/allegro.men"
+[[decided]]
+ext = "r2c"
+decision = "exclude"
+date = "2026-11-22"
+example = "OrCAD/OrCAD_16.3_Demo/share/pcb/text/cuimenus/allegro.r2c"
+[[decided]]
+ext = "icon"
+decision = "exclude"
+date = "2026-11-22"
+example = "OrCAD/OrCAD_16.3_Demo/share/pcb/text/icons/23_box.icon"
+[[decided]]
+ext = "material"
+decision = "exclude"
+date = "2026-11-22"
+example = "OrCAD/OrCAD_16.3_Demo/share/pcb/text/materials/fr4.material"
+[[decided]]
+ext = "dlt"
+decision = "exclude"
+date = "2026-11-22"
+example = "OrCAD/OrCAD_16.3_Demo/share/pcb/text/nclegend/default-cm.dlt"
+[[decided]]
+ext = "dtd"
+decision = "exclude"
+date = "2026-11-22"
+example = "OrCAD/OrCAD_16.3_Demo/share/pcb/text/tech/cdnadrc.dtd"
+[[decided]]
+ext = "tech"
+decision = "exclude"
+date = "2026-11-22"
+example = "OrCAD/OrCAD_16.3_Demo/share/pcb/text/tech/tech_sample.tech"
+[[decided]]
+ext = "do"
+decision = "exclude"
+date = "2026-11-22"
+example = "OrCAD/OrCAD_16.3_Demo/share/specctra/tutorial/alternat.do"
+[[decided]]
+ext = "dsn"
+decision = "exclude"
+date = "2026-11-22"
+example = "OrCAD/OrCAD_16.3_Demo/share/specctra/tutorial/conflict.dsn"
+[[decided]]
+ext = "w"
+decision = "exclude"
+date = "2026-11-22"
+example = "OrCAD/OrCAD_16.3_Demo/share/specctra/tutorial/lesson5a.w"
+[[decided]]
+ext = "rte"
+decision = "exclude"
+date = "2026-11-22"
+example = "OrCAD/OrCAD_16.3_Demo/share/specctra/tutorial/recorner.rte"
+[[decided]]
+ext = "vhx"
+decision = "exclude"
+date = "2026-11-22"
+example = "OrCAD/OrCAD_16.3_Demo/tools/capture/attribute.vhx"
+[[decided]]
+ext = "pif"
+decision = "exclude"
+date = "2026-11-22"
+example = "OrCAD/OrCAD_16.3_Demo/tools/capture/comp16.pif"
+[[decided]]
+ext = "ctl"
+decision = "exclude"
+date = "2026-11-22"
+example = "OrCAD/OrCAD_16.3_Demo/tools/capture/layout.ctl"
+[[decided]]
+ext = "vrx"
+decision = "exclude"
+date = "2026-11-22"
+example = "OrCAD/OrCAD_16.3_Demo/tools/capture/standard.vrx"
+[[decided]]
+ext = "olb"
+decision = "exclude"
+date = "2026-11-22"
+example = "OrCAD/OrCAD_16.3_Demo/tools/capture/library/ATOD.OLB"
+[[decided]]
+ext = "etc"
+decision = "exclude"
+date = "2026-11-22"
+example = "OrCAD/OrCAD_16.3_Demo/tools/capture/library/pspice/marker.etc"
+[[decided]]
+ext = "dbc"
+decision = "exclude"
+date = "2026-11-22"
+example = "OrCAD/OrCAD_16.3_Demo/tools/capture/samples/DemoBENCHACC.DBC"
+[[decided]]
+ext = "rpt"
+decision = "exclude"
+date = "2026-11-22"
+example = "OrCAD/OrCAD_16.3_Demo/tools/capture/samples/approval.rpt"
+[[decided]]
+ext = "opj"
+decision = "exclude"
+date = "2026-11-22"
+example = "OrCAD/OrCAD_16.3_Demo/tools/capture/samples/bench_allegro.opj"
+[[decided]]
+ext = "sim"
+decision = "exclude"
+date = "2026-11-22"
+example = "OrCAD/OrCAD_16.3_Demo/tools/capture/templates/pspice/AnalogGNDSymbol-PSpiceFiles/SCHEMATIC1/bias.sim"
+[[decided]]
+ext = "mrk"
+decision = "exclude"
+date = "2026-11-22"
+example = "OrCAD/OrCAD_16.3_Demo/tools/capture/templates/pspice/AnalogGNDSymbol-PSpiceFiles/SCHEMATIC1/bias/bias.mrk"
+[[decided]]
+ext = "vbp"
+decision = "exclude"
+date = "2026-11-22"
+example = "OrCAD/OrCAD_16.3_Demo/tools/capture/usernetl/pcbiil.vbp"
+[[decided]]
+ext = "jsa"
+decision = "exclude"
+date = "2026-11-22"
+example = "OrCAD/OrCAD_16.3_Demo/tools/jre/bin/client/classes.jsa"
+[[decided]]
+ext = "bfc"
+decision = "exclude"
+date = "2026-11-22"
+example = "OrCAD/OrCAD_16.3_Demo/tools/jre/lib/fontconfig.98.bfc"
+[[decided]]
+ext = "src"
+decision = "exclude"
+date = "2026-11-22"
+example = "OrCAD/OrCAD_16.3_Demo/tools/jre/lib/fontconfig.98.properties.src"
+[[decided]]
+ext = "ja"
+decision = "exclude"
+date = "2026-11-22"
+example = "OrCAD/OrCAD_16.3_Demo/tools/jre/lib/psfont.properties.ja"
+[[decided]]
+ext = "gm"
+decision = "exclude"
+date = "2026-11-22"
+example = "OrCAD/OrCAD_16.3_Demo/tools/jre/lib/audio/soundbank.gm"
+[[decided]]
+ext = "access"
+decision = "exclude"
+date = "2026-11-22"
+example = "OrCAD/OrCAD_16.3_Demo/tools/jre/lib/management/jmxremote.access"
+[[decided]]
+ext = "template"
+decision = "exclude"
+date = "2026-11-22"
+example = "OrCAD/OrCAD_16.3_Demo/tools/jre/lib/management/jmxremote.password.template"
+[[decided]]
+ext = "mime:application/x-java-keystore"
+decision = "exclude"
+date = "2026-11-22"
+example = "OrCAD/OrCAD_16.3_Demo/tools/jre/lib/security/cacerts"
+[[decided]]
+ext = "policy"
+decision = "exclude"
+date = "2026-11-22"
+example = "OrCAD/OrCAD_16.3_Demo/tools/jre/lib/security/java.policy"
+[[decided]]
+ext = "security"
+decision = "exclude"
+date = "2026-11-22"
+example = "OrCAD/OrCAD_16.3_Demo/tools/jre/lib/security/java.security"
+[[decided]]
+ext = "pl"
+decision = "exclude"
+date = "2026-11-22"
+example = "OrCAD/OrCAD_16.3_Demo/tools/pcb/bin/dev_check.pl"
+[[decided]]
+ext = "pm"
+decision = "exclude"
+date = "2026-11-22"
+example = "OrCAD/OrCAD_16.3_Demo/tools/perl5/lib/AnyDBM_File.pm"
+[[decided]]
+ext = "ph"
+decision = "exclude"
+date = "2026-11-22"
+example = "OrCAD/OrCAD_16.3_Demo/tools/perl5/lib/NT.PH"
+[[decided]]
+ext = "inter"
+decision = "exclude"
+date = "2026-11-22"
+example = "OrCAD/OrCAD_16.3_Demo/tools/perl5/lib/chat2.inter"
+[[decided]]
+ext = "nt"
+decision = "exclude"
+date = "2026-11-22"
+example = "OrCAD/OrCAD_16.3_Demo/tools/perl5/lib/ExtUtils/readme.nt"
+[[decided]]
+ext = "mime:text/x-file"
+decision = "exclude"
+date = "2026-11-22"
+example = "OrCAD/OrCAD_16.3_Demo/tools/perl5/lib/ExtUtils/typemap"
+[[decided]]
+ext = "pll"
+decision = "exclude"
+date = "2026-11-22"
+example = "OrCAD/OrCAD_16.3_Demo/tools/perl5/lib/auto/SDBM_File/SDBM_File.pll"
+[[decided]]
+ext = "ntt"
+decision = "exclude"
+date = "2026-11-22"
+example = "OrCAD/OrCAD_16.3_Demo/tools/perl5/ntt/Base/cond.ntt"
+[[decided]]
+ext = "test"
+decision = "exclude"
+date = "2026-11-22"
+example = "OrCAD/OrCAD_16.3_Demo/tools/perl5/ntt/NT/netadmin.manual.test"
+[[decided]]
+ext = "or0"
+decision = "exclude"
+date = "2026-11-22"
+example = "OrCAD/OrCAD_16.3_Demo/tools/pspice/PSpice.OR0"
+[[decided]]
+ext = "keys"
+decision = "exclude"
+date = "2026-11-22"
+example = "OrCAD/OrCAD_16.3_Demo/tools/pspice/pspice__Alternate_View.keys"
+[[decided]]
+ext = "prb"
+decision = "exclude"
+date = "2026-11-22"
+example = "OrCAD/OrCAD_16.3_Demo/tools/pspice/Common/pspice.prb"
+[[decided]]
+ext = "als"
+decision = "exclude"
+date = "2026-11-22"
+example = "OrCAD/OrCAD_16.3_Demo/tools/pspice/Demo_samples/advanls/bpf/bpf-PSpiceFiles/SCHEMATIC1/SCHEMATIC1.ALS"
+[[decided]]
+ext = "aap"
+decision = "exclude"
+date = "2026-11-22"
+example = "OrCAD/OrCAD_16.3_Demo/tools/pspice/Demo_samples/advanls/bpf/bpf-PSpiceFiles/SCHEMATIC1/SCHEMATIC1.aap"
+[[decided]]
+ext = "net"
+decision = "exclude"
+date = "2026-11-22"
+example = "OrCAD/OrCAD_16.3_Demo/tools/pspice/Demo_samples/advanls/bpf/bpf-PSpiceFiles/SCHEMATIC1/SCHEMATIC1.net"
+[[decided]]
+ext = "prp"
+decision = "exclude"
+date = "2026-11-22"
+example = "OrCAD/OrCAD_16.3_Demo/tools/pspice/Demo_samples/advanls/bpf/bpf-PSpiceFiles/SCHEMATIC1/SCHEMATIC1_sch.prp"
+[[decided]]
+ext = "cir"
+decision = "exclude"
+date = "2026-11-22"
+example = "OrCAD/OrCAD_16.3_Demo/tools/pspice/Demo_samples/advanls/bpf/bpf-PSpiceFiles/SCHEMATIC1/AC/AC.cir"
+[[decided]]
+ext = "mgt"
+decision = "exclude"
+date = "2026-11-22"
+example = "OrCAD/OrCAD_16.3_Demo/tools/pspice/Templates/FLYBACKTRANSFORMER.mgt"
+[[decided]]
+ext = "ind"
+decision = "exclude"
+date = "2026-11-22"
+example = "OrCAD/OrCAD_16.3_Demo/tools/pspice/library/NOMD.IND"
+[[decided]]
+ext = "category"
+decision = "exclude"
+date = "2026-11-22"
+example = "OrCAD/OrCAD_16.3_Demo/tools/pspice/library/device.category"
+[[decided]]
+ext = "2"
+decision = "exclude"
+date = "2026-11-22"
+example = "OrCAD/OrCAD_16.3_Demo/tools/pspice/library/distribution/bimd.4.2"
+[[decided]]
+ext = "4"
+decision = "exclude"
+date = "2026-11-22"
+example = "OrCAD/OrCAD_16.3_Demo/tools/pspice/library/distribution/gauss0.4"
+[[decided]]
+ext = "8"
+decision = "exclude"
+date = "2026-11-22"
+example = "OrCAD/OrCAD_16.3_Demo/tools/pspice/library/distribution/skew.4.8"
+[[decided]]
+ext = "tbl"
+decision = "exclude"
+date = "2026-11-22"
+example = "OrCAD/OrCAD_16.3_Demo/tools/pspice/tutorial/capture/pspiceaa/Snubber/SNUBBER-PSpiceFiles/Snubber/CurrentPlot.tbl"
+[[decided]]
+ext = "mif"
+decision = "exclude"
+date = "2026-11-22"
+example = "OrCAD/OrCAD_16.3_Demo/tools/pspice/tutorial/capture/pspiceaa/Snubber/SNUBBER-PSpiceFiles/Snubber/dc_sweep/dc_sweep.mif"
+[[decided]]
+ext = "1op"
+decision = "exclude"
+date = "2026-11-22"
+example = "OrCAD/OrCAD_16.3_Demo/tools/pspice/tutorial/capture/pspiceaa/Snubber/SNUBBER-PSpiceFiles/Snubber/transient/transient.1OP"
+[[decided]]
+ext = "startup"
+decision = "exclude"
+date = "2026-11-22"
+example = "OrCAD/OrCAD_16.3_Demo/tools/specctra/common/layout.startup"
+[[decided]]
+ext = "ps"
+decision = "exclude"
+date = "2026-11-22"
+example = "OrCAD/OrCAD_16.3_Demo/tools/tcltk/tcl/lib/tk8.0/prolog.ps"
+[[decided]]
+ext = "ppm"
+decision = "exclude"
+date = "2026-11-22"
+example = "OrCAD/OrCAD_16.3_Demo/tools/tcltk/tcl/lib/tk8.0/demos/images/teapot.ppm"
+[[decided]]
+ext = "pyd"
+decision = "exclude"
+date = "2026-11-22"
+example = "Python27/DLLs/_bsddb.pyd"
+[[decided]]
+ext = "au"
+decision = "exclude"
+date = "2026-11-22"
+example = "Python27/Lib/email/test/data/audiotest.au"
+[[decided]]
+ext = "pyw"
+decision = "exclude"
+date = "2026-11-22"
+example = "Python27/Lib/idlelib/idle.pyw"
+[[decided]]
+ext = "aif"
+decision = "exclude"
+date = "2026-11-22"
+example = "Python27/Lib/test/Sine-1000Hz-300ms.aif"
+[[decided]]
+ext = "pem"
+decision = "exclude"
+date = "2026-11-22"
+example = "Python27/Lib/test/badcert.pem"
+[[decided]]
+ext = "1"
+decision = "exclude"
+date = "2026-11-22"
+example = "Python27/Lib/test/cfgparser.1"
+[[decided]]
+ext = "uue"
+decision = "exclude"
+date = "2026-11-22"
+example = "Python27/Lib/test/greyrgb.uue"
+[[decided]]
+ext = "pck"
+decision = "exclude"
+date = "2026-11-22"
+example = "Python27/Lib/test/randv2_32.pck"
+[[decided]]
+ext = "dectest"
+decision = "exclude"
+date = "2026-11-22"
+example = "Python27/Lib/test/decimaltestdata/abs.decTest"
+[[decided]]
+ext = "out"
+decision = "exclude"
+date = "2026-11-22"
+example = "Python27/Lib/test/xmltestdata/test.xml.out"
+[[decided]]
+ext = "tm"
+decision = "exclude"
+date = "2026-11-22"
+example = "Python27/tcl/tcl8/8.4/http-2.7.tm"
+[[decided]]
+ext = "enc"
+decision = "exclude"
+date = "2026-11-22"
+example = "Python27/tcl/tcl8.5/encoding/ascii.enc"
+[[decided]]
+ext = "xbm"
+decision = "exclude"
+date = "2026-11-22"
+example = "Python27/tcl/tix8.4.3/bitmaps/act_fold.xbm"
+[[decided]]
+ext = "xpm"
+decision = "exclude"
+date = "2026-11-22"
+example = "Python27/tcl/tix8.4.3/bitmaps/act_fold.xpm"
+[[decided]]
+ext = "mask"
+decision = "exclude"
+date = "2026-11-22"
+example = "Python27/tcl/tix8.4.3/bitmaps/hourglas.mask"
+[[decided]]
+ext = "fs"
+decision = "exclude"
+date = "2026-11-22"
+example = "Python27/tcl/tix8.4.3/pref/10Point.fs"
+[[decided]]
+ext = "fsc"
+decision = "exclude"
+date = "2026-11-22"
+example = "Python27/tcl/tix8.4.3/pref/10Point.fsc"
+[[decided]]
+ext = "cs"
+decision = "exclude"
+date = "2026-11-22"
+example = "Python27/tcl/tix8.4.3/pref/Bisque.cs"
+[[decided]]
+ext = "csc"
+decision = "exclude"
+date = "2026-11-22"
+example = "Python27/tcl/tix8.4.3/pref/Bisque.csc"
+[[decided]]
+ext = "mime:text/x-tcl"
+decision = "exclude"
+date = "2026-11-22"
+example = "Python27/tcl/tix8.4.3/pref/tixmkpref"
+[[decided]]
+ext = "terms"
+decision = "exclude"
+date = "2026-11-22"
+example = "Python27/tcl/tk8.5/license.terms"
+[[decided]]
+ext = "log2"
+decision = "exclude"
+date = "2026-11-22"
+example = "Riot Games/League of Legends/RADS/rads_user_kernel.log2"
+[[decided]]
+ext = "log3"
+decision = "exclude"
+date = "2026-11-22"
+example = "Riot Games/League of Legends/RADS/rads_user_kernel.log3"
+[[decided]]
+ext = "log4"
+decision = "exclude"
+date = "2026-11-22"
+example = "Riot Games/League of Legends/RADS/rads_user_kernel.log4"
+[[decided]]
+ext = "log5"
+decision = "exclude"
+date = "2026-11-22"
+example = "Riot Games/League of Legends/RADS/rads_user_kernel.log5"
+[[decided]]
+ext = "log7"
+decision = "exclude"
+date = "2026-11-22"
+example = "Riot Games/League of Legends/RADS/rads_user_kernel.log7"
+[[decided]]
+ext = "vch"
+decision = "exclude"
+date = "2026-11-22"
+example = "Riot Games/League of Legends/RADS/projects/lol_air_client/releases/0.0.1.46/deploy/Adobe AIR/Versions/1.0/Resources/Adobe AIR.vch"
+[[decided]]
+ext = "help"
+decision = "exclude"
+date = "2026-11-22"
+example = "Riot Games/League of Legends/RADS/projects/lol_air_client/releases/0.0.1.46/deploy/assets/help/de_DE/Chat.help"
+[[decided]]
+ext = "riotmod"
+decision = "exclude"
+date = "2026-11-22"
+example = "Riot Games/League of Legends/RADS/projects/lol_air_client/releases/0.0.1.46/deploy/mod/ale/info.riotmod"
+[[decided]]
+ext = "dds"
+decision = "exclude"
+date = "2026-11-22"
+example = "Riot Games/League of Legends/RADS/projects/lol_game_client/releases/0.0.0.180/deploy/DATA/Images/SplashScreen.dds"
+[[decided]]
+ext = "fev"
+decision = "exclude"
+date = "2026-11-22"
+example = "Riot Games/League of Legends/RADS/projects/lol_game_client_en_us/managedfiles/0.0.0.159/DATA/Sounds/FMOD/LoL_Audio_en_US.fev"
+[[decided]]
+ext = "fsb"
+decision = "exclude"
+date = "2026-11-22"
+example = "Riot Games/League of Legends/RADS/projects/lol_game_client_en_us/managedfiles/0.0.0.159/DATA/Sounds/FMOD/VOBank_en_US.fsb"
+[[decided]]
+ext = "tra"
+decision = "exclude"
+date = "2026-11-22"
+example = "Riot Games/League of Legends/RADS/projects/lol_launcher/managedfiles/0.0.0.113/unknown_region_ru_RU.tra"
+[[decided]]
+ext = "gfx"
+decision = "exclude"
+date = "2026-11-22"
+example = "Riot Games/League of Legends/RADS/projects/lol_launcher/managedfiles/0.0.0.178/fonts_ch.gfx"
+[[decided]]
+ext = "mime:application/x-dbt"
+decision = "exclude"
+date = "2026-11-22"
+example = "Riot Games/League of Legends/RADS/projects/lol_launcher/releases/0.0.0.185/releasemanifest"
+[[decided]]
+ext = "usr"
+decision = "exclude"
+date = "2026-11-22"
+example = "SPB_Data/eaglerc.usr"
+[[decided]]
+ext = "opf"
+decision = "exclude"
+date = "2026-11-22"
+example = "SPB_Data/Calibre Library/Alice Sebold/The Lovely Bones (220)/metadata.opf"
+[[decided]]
+ext = "epf"
+decision = "exclude"
+date = "2026-11-22"
+example = "SPB_Data/eagle/clock/eagle.epf"
+[[decided]]
+ext = "at"
+decision = "exclude"
+date = "2026-11-22"
+example = "TEMP/sysgentmp-Anthony-laptop/xlpartinfo/xlpartinfo.at"
+[[decided]]
+ext = "10"
+decision = "exclude"
+date = "2026-11-22"
+example = "Users/Anthony-laptop/MPLABXLog.xml.10"
+[[decided]]
+ext = "11"
+decision = "exclude"
+date = "2026-11-22"
+example = "Users/Anthony-laptop/MPLABXLog.xml.11"
+[[decided]]
+ext = "19"
+decision = "exclude"
+date = "2026-11-22"
+example = "Users/Anthony-laptop/MPLABXLog.xml.19"
+[[decided]]
+ext = "21"
+decision = "exclude"
+date = "2026-11-22"
+example = "Users/Anthony-laptop/MPLABXLog.xml.21"
+[[decided]]
+ext = "24"
+decision = "exclude"
+date = "2026-11-22"
+example = "Users/Anthony-laptop/MPLABXLog.xml.24"
+[[decided]]
+ext = "25"
+decision = "exclude"
+date = "2026-11-22"
+example = "Users/Anthony-laptop/MPLABXLog.xml.25"
+[[decided]]
+ext = "3"
+decision = "exclude"
+date = "2026-11-22"
+example = "Users/Anthony-laptop/MPLABXLog.xml.3"
+[[decided]]
+ext = "5"
+decision = "exclude"
+date = "2026-11-22"
+example = "Users/Anthony-laptop/MPLABXLog.xml.5"
+[[decided]]
+ext = "6"
+decision = "exclude"
+date = "2026-11-22"
+example = "Users/Anthony-laptop/MPLABXLog.xml.6"
+[[decided]]
+ext = "7"
+decision = "exclude"
+date = "2026-11-22"
+example = "Users/Anthony-laptop/MPLABXLog.xml.7"
+[[decided]]
+ext = "82"
+decision = "exclude"
+date = "2026-11-22"
+example = "Users/Anthony-laptop/MPLABXLog.xml.82"
+[[decided]]
+ext = "9"
+decision = "exclude"
+date = "2026-11-22"
+example = "Users/Anthony-laptop/MPLABXLog.xml.9"
+[[decided]]
+ext = "mime:text/x-ssh-private-key"
+decision = "exclude"
+date = "2026-11-22"
+example = "Users/Anthony-laptop/.android/adbkey"
+[[decided]]
+ext = "prefs"
+decision = "exclude"
+date = "2026-11-22"
+example = "Users/Anthony-laptop/.eclipse/org.eclipse.platform_3.7.0_1681229919/configuration/.settings/org.eclipse.ui.ide.prefs"
+[[decided]]
+ext = "mappings"
+decision = "exclude"
+date = "2026-11-22"
+example = "Users/Anthony-laptop/.eclipse/org.eclipse.platform_3.7.0_1681229919/configuration/org.eclipse.osgi/bundles/164/1/.cp/about.mappings"
+[[decided]]
+ext = "rsa"
+decision = "exclude"
+date = "2026-11-22"
+example = "Users/Anthony-laptop/.eclipse/org.eclipse.platform_3.7.0_1681229919/configuration/org.eclipse.osgi/bundles/164/1/.cp/META-INF/ECLIPSEF.RSA"
+[[decided]]
+ext = "sf"
+decision = "exclude"
+date = "2026-11-22"
+example = "Users/Anthony-laptop/.eclipse/org.eclipse.platform_3.7.0_1681229919/configuration/org.eclipse.osgi/bundles/164/1/.cp/META-INF/ECLIPSEF.SF"
+[[decided]]
+ext = "mf"
+decision = "exclude"
+date = "2026-11-22"
+example = "Users/Anthony-laptop/.eclipse/org.eclipse.platform_3.7.0_1681229919/configuration/org.eclipse.osgi/bundles/164/1/.cp/META-INF/MANIFEST.MF"
+[[decided]]
+ext = "timestamps"
+decision = "exclude"
+date = "2026-11-22"
+example = "Users/Anthony-laptop/.eclipse/org.eclipse.platform_3.7.0_1681229919/configuration/org.eclipse.osgi/bundles/289/data/cache.timestamps"
+[[decided]]
+ext = "dictionary"
+decision = "exclude"
+date = "2026-11-22"
+example = "Users/Anthony-laptop/.eclipse/org.eclipse.platform_3.7.0_1681229919/configuration/org.eclipse.osgi/bundles/331/1/.cp/dictionaries/en_GB.dictionary"
+[[decided]]
+ext = "15"
+decision = "exclude"
+date = "2026-11-22"
+example = "Users/Anthony-laptop/.eclipse/org.eclipse.platform_3.7.0_1709980481/configuration/org.eclipse.core.runtime/.manager/.fileTable.15"
+[[decided]]
+ext = "16"
+decision = "exclude"
+date = "2026-11-22"
+example = "Users/Anthony-laptop/.eclipse/org.eclipse.platform_3.7.0_1709980481/configuration/org.eclipse.core.runtime/.manager/.fileTable.16"
+[[decided]]
+ext = "exsd"
+decision = "exclude"
+date = "2026-11-22"
+example = "Users/Anthony-laptop/.eclipse/org.eclipse.platform_3.7.0_1709980481/configuration/org.eclipse.osgi/bundles/182/1/.cp/schema/discoveryLaunch.exsd"
+[[decided]]
+ext = "mime:application/vnd.microsoft.portable-executable"
+decision = "exclude"
+date = "2026-11-22"
+example = "Users/Anthony-laptop/.explorer.cache/sha256z0833bd84619a152bbdbd871ed6ab10a93db6ee8acd044415662de1d18c096c62z2495488"
+[[decided]]
+ext = "assets"
+decision = "exclude"
+date = "2026-11-22"
+example = "Users/Anthony-laptop/.explorer.local/explorer/explorer-win64/explorer-win64_Data/resources.assets"
+[[decided]]
+ext = "aspx"
+decision = "exclude"
+date = "2026-11-22"
+example = "Users/Anthony-laptop/.explorer.local/explorer/explorer-win64/explorer-win64_Data/Mono/etc/mono/1.0/DefaultWsdlHelpGenerator.aspx"
+[[decided]]
+ext = "map"
+decision = "exclude"
+date = "2026-11-22"
+example = "Users/Anthony-laptop/.explorer.local/explorer/explorer-win64/explorer-win64_Data/Mono/etc/mono/2.0/settings.map"
+[[decided]]
+ext = "browser"
+decision = "exclude"
+date = "2026-11-22"
+example = "Users/Anthony-laptop/.explorer.local/explorer/explorer-win64/explorer-win64_Data/Mono/etc/mono/2.0/Browsers/Compat.browser"
+[[decided]]
+ext = "asv"
+decision = "exclude"
+date = "2026-11-22"
+example = "Users/Anthony-laptop/Desktop/3dSpectrum.asv"
+[[decided]]
+ext = "kmz"
+decision = "exclude"
+date = "2026-11-22"
+example = "Users/Anthony-laptop/Desktop/fsm9_034941.kmz"
+[[decided]]
+ext = "boot"
+decision = "exclude"
+date = "2026-11-22"
+example = "Users/Anthony-laptop/Desktop/ArrlAntennaBook/setup.boot"
+[[decided]]
+ext = "xlt"
+decision = "exclude"
+date = "2026-11-22"
+example = "Users/Anthony-laptop/Desktop/P90X/Documents/Cool Random Stuff/P90X_Market_List.xlt"
+[[decided]]
+ext = "cache"
+decision = "exclude"
+date = "2026-11-22"
+example = "Users/Anthony-laptop/Desktop/androidBackup/Android/data/com.cooliris.media/cache/hires-image-cache/-1008165824657995380_512.cache"
+[[decided]]
+ext = "0"
+decision = "exclude"
+date = "2026-11-22"
+example = "Users/Anthony-laptop/Desktop/androidBackup/Android/data/com.google.android.apps.maps/cache/cache_Resource.0"
+[[decided]]
+ext = "12"
+decision = "exclude"
+date = "2026-11-22"
+example = "Users/Anthony-laptop/Desktop/androidBackup/Android/data/com.google.android.apps.maps/cache/cache_vts_GMM.12"
+[[decided]]
+ext = "13"
+decision = "exclude"
+date = "2026-11-22"
+example = "Users/Anthony-laptop/Desktop/androidBackup/Android/data/com.google.android.apps.maps/cache/cache_vts_GMM.13"
+[[decided]]
+ext = "14"
+decision = "exclude"
+date = "2026-11-22"
+example = "Users/Anthony-laptop/Desktop/androidBackup/Android/data/com.google.android.apps.maps/cache/cache_vts_GMM.14"
+[[decided]]
+ext = "17"
+decision = "exclude"
+date = "2026-11-22"
+example = "Users/Anthony-laptop/Desktop/androidBackup/Android/data/com.google.android.apps.maps/cache/cache_vts_GMM.17"
+[[decided]]
+ext = "18"
+decision = "exclude"
+date = "2026-11-22"
+example = "Users/Anthony-laptop/Desktop/androidBackup/Android/data/com.google.android.apps.maps/cache/cache_vts_GMM.18"
+[[decided]]
+ext = "20"
+decision = "exclude"
+date = "2026-11-22"
+example = "Users/Anthony-laptop/Desktop/androidBackup/Android/data/com.google.android.apps.maps/cache/cache_vts_GMM.20"
+[[decided]]
+ext = "22"
+decision = "exclude"
+date = "2026-11-22"
+example = "Users/Anthony-laptop/Desktop/androidBackup/Android/data/com.google.android.apps.maps/cache/cache_vts_GMM.22"
+[[decided]]
+ext = "23"
+decision = "exclude"
+date = "2026-11-22"
+example = "Users/Anthony-laptop/Desktop/androidBackup/Android/data/com.google.android.apps.maps/cache/cache_vts_GMM.23"
+[[decided]]
+ext = "26"
+decision = "exclude"
+date = "2026-11-22"
+example = "Users/Anthony-laptop/Desktop/androidBackup/Android/data/com.google.android.apps.maps/cache/cache_vts_GMM.26"
+[[decided]]
+ext = "27"
+decision = "exclude"
+date = "2026-11-22"
+example = "Users/Anthony-laptop/Desktop/androidBackup/Android/data/com.google.android.apps.maps/cache/cache_vts_GMM.27"
+[[decided]]
+ext = "28"
+decision = "exclude"
+date = "2026-11-22"
+example = "Users/Anthony-laptop/Desktop/androidBackup/Android/data/com.google.android.apps.maps/cache/cache_vts_GMM.28"
+[[decided]]
+ext = "29"
+decision = "exclude"
+date = "2026-11-22"
+example = "Users/Anthony-laptop/Desktop/androidBackup/Android/data/com.google.android.apps.maps/cache/cache_vts_GMM.29"
+[[decided]]
+ext = "30"
+decision = "exclude"
+date = "2026-11-22"
+example = "Users/Anthony-laptop/Desktop/androidBackup/Android/data/com.google.android.apps.maps/cache/cache_vts_GMM.30"
+[[decided]]
+ext = "31"
+decision = "exclude"
+date = "2026-11-22"
+example = "Users/Anthony-laptop/Desktop/androidBackup/Android/data/com.google.android.apps.maps/cache/cache_vts_GMM.31"
+[[decided]]
+ext = "32"
+decision = "exclude"
+date = "2026-11-22"
+example = "Users/Anthony-laptop/Desktop/androidBackup/Android/data/com.google.android.apps.maps/cache/cache_vts_GMM.32"
+[[decided]]
+ext = "33"
+decision = "exclude"
+date = "2026-11-22"
+example = "Users/Anthony-laptop/Desktop/androidBackup/Android/data/com.google.android.apps.maps/cache/cache_vts_GMM.33"
+[[decided]]
+ext = "34"
+decision = "exclude"
+date = "2026-11-22"
+example = "Users/Anthony-laptop/Desktop/androidBackup/Android/data/com.google.android.apps.maps/cache/cache_vts_GMM.34"
+[[decided]]
+ext = "m3u"
+decision = "exclude"
+date = "2026-11-22"
+example = "Users/Anthony-laptop/Desktop/androidBackup/music/Jason Aldean - Wide Open/Jason Aldean - Wide Open.m3u"
+[[decided]]
+ext = "save"
+decision = "exclude"
+date = "2026-11-22"
+example = "Users/Anthony-laptop/Desktop/androidBackup/xconstruction/savegames/draft1.save"
+[[decided]]
+ext = "ios"
+decision = "exclude"
+date = "2026-11-22"
+example = "Users/Anthony-laptop/Desktop/desktop/2I252022.IOS"
+[[decided]]
+ext = "part"
+decision = "exclude"
+date = "2026-11-22"
+example = "Users/Anthony-laptop/Desktop/desktop/ChromeSetup.exe.part"
+[[decided]]
+ext = "123"
+decision = "exclude"
+date = "2026-11-22"
+example = "Users/Anthony-laptop/Desktop/desktop/DawnProto1.123"
+[[decided]]
+ext = "fig"
+decision = "exclude"
+date = "2026-11-22"
+example = "Users/Anthony-laptop/Desktop/desktop/blah.fig"
+[[decided]]
+ext = "v"
+decision = "exclude"
+date = "2026-11-22"
+example = "Users/Anthony-laptop/Desktop/desktop/mit.v"
+[[decided]]
+ext = "coe"
+decision = "exclude"
+date = "2026-11-22"
+example = "Users/Anthony-laptop/Desktop/desktop/test.coe"
+[[decided]]
+ext = "016"
+decision = "exclude"
+date = "2026-11-22"
+example = "Users/Anthony-laptop/Desktop/desktop/Age Of Empires II+Age of Empires 2 - The Conquerors Expansion+stuff with online play/Age Of Empires II/00000409.016"
+[[decided]]
+ext = "256"
+decision = "exclude"
+date = "2026-11-22"
+example = "Users/Anthony-laptop/Desktop/desktop/Age Of Empires II+Age of Empires 2 - The Conquerors Expansion+stuff with online play/Age Of Empires II/00000409.256"
+[[decided]]
+ext = "vxd"
+decision = "exclude"
+date = "2026-11-22"
+example = "Users/Anthony-laptop/Desktop/desktop/Age Of Empires II+Age of Empires 2 - The Conquerors Expansion+stuff with online play/Age Of Empires II/DIRECTX/DDRAW.VXD"
+[[decided]]
+ext = "dls"
+decision = "exclude"
+date = "2026-11-22"
+example = "Users/Anthony-laptop/Desktop/desktop/Age Of Empires II+Age of Empires 2 - The Conquerors Expansion+stuff with online play/Age Of Empires II/DIRECTX/GM16.DLS"
+[[decided]]
+ext = "nec"
+decision = "exclude"
+date = "2026-11-22"
+example = "Users/Anthony-laptop/Desktop/desktop/Age Of Empires II+Age of Empires 2 - The Conquerors Expansion+stuff with online play/Age Of Empires II/DIRECTX/VMCPD.NEC"
+[[decided]]
+ext = "x86"
+decision = "exclude"
+date = "2026-11-22"
+example = "Users/Anthony-laptop/Desktop/desktop/Age Of Empires II+Age of Empires 2 - The Conquerors Expansion+stuff with online play/Age Of Empires II/DIRECTX/VMCPD.X86"
+[[decided]]
+ext = "ddb"
+decision = "exclude"
+date = "2026-11-22"
+example = "Users/Anthony-laptop/Desktop/desktop/Age Of Empires II+Age of Empires 2 - The Conquerors Expansion+stuff with online play/Age Of Empires II/DIRECTX/DRIVERS/BRZ/DRIVERS.DDB"
+[[decided]]
+ext = "uc"
+decision = "exclude"
+date = "2026-11-22"
+example = "Users/Anthony-laptop/Desktop/desktop/Age Of Empires II+Age of Empires 2 - The Conquerors Expansion+stuff with online play/Age Of Empires II/DIRECTX/DRIVERS/ENG/REND2D.UC"
+[[decided]]
+ext = "sbk"
+decision = "exclude"
+date = "2026-11-22"
+example = "Users/Anthony-laptop/Desktop/desktop/Age Of Empires II+Age of Empires 2 - The Conquerors Expansion+stuff with online play/Age Of Empires II/DIRECTX/DRIVERS/ENG/SYNTHGM.SBK"
+[[decided]]
+ext = "mpd"
+decision = "exclude"
+date = "2026-11-22"
+example = "Users/Anthony-laptop/Desktop/desktop/Age Of Empires II+Age of Empires 2 - The Conquerors Expansion+stuff with online play/Age Of Empires II/DIRECTX/DRIVERS/ENG/TMV1.MPD"
+[[decided]]
+ext = "acv"
+decision = "exclude"
+date = "2026-11-22"
+example = "Users/Anthony-laptop/Desktop/desktop/Age Of Empires II+Age of Empires 2 - The Conquerors Expansion+stuff with online play/Age Of Empires II/DIRECTX/DRIVERS/ENG/WFM0200.ACV"
+[[decided]]
+ext = "csp"
+decision = "exclude"
+date = "2026-11-22"
+example = "Users/Anthony-laptop/Desktop/desktop/Age Of Empires II+Age of Empires 2 - The Conquerors Expansion+stuff with online play/Age Of Empires II/DIRECTX/DRIVERS/ENG/WFM0200A.CSP"
+[[decided]]
+ext = "icd"
+decision = "exclude"
+date = "2026-11-22"
+example = "Users/Anthony-laptop/Desktop/desktop/Age Of Empires II+Age of Empires 2 - The Conquerors Expansion+stuff with online play/Age Of Empires II/GAME/EMPIRES2.ICD"
+[[decided]]
+ext = "slp"
+decision = "exclude"
+date = "2026-11-22"
+example = "Users/Anthony-laptop/Desktop/desktop/Age Of Empires II+Age of Empires 2 - The Conquerors Expansion+stuff with online play/Age Of Empires II/GAME/CAMPAIGN/MEDIA/BACKGRD.SLP"
+[[decided]]
+ext = "pal"
+decision = "exclude"
+date = "2026-11-22"
+example = "Users/Anthony-laptop/Desktop/desktop/Age Of Empires II+Age of Empires 2 - The Conquerors Expansion+stuff with online play/Age Of Empires II/GAME/CAMPAIGN/MEDIA/BACKGRD1.PAL"
+[[decided]]
+ext = "sin"
+decision = "exclude"
+date = "2026-11-22"
+example = "Users/Anthony-laptop/Desktop/desktop/Age Of Empires II+Age of Empires 2 - The Conquerors Expansion+stuff with online play/Age Of Empires II/GAME/CAMPAIGN/MEDIA/BACKGRD1.SIN"
+[[decided]]
+ext = "mm"
+decision = "exclude"
+date = "2026-11-22"
+example = "Users/Anthony-laptop/Desktop/desktop/Age Of Empires II+Age of Empires 2 - The Conquerors Expansion+stuff with online play/Age Of Empires II/GAME/CAMPAIGN/MEDIA/C1S1_BEG.MM"
+[[decided]]
+ext = "bln"
+decision = "exclude"
+date = "2026-11-22"
+example = "Users/Anthony-laptop/Desktop/desktop/Age Of Empires II+Age of Empires 2 - The Conquerors Expansion+stuff with online play/Age Of Empires II/GAME/CAMPAIGN/MEDIA/CAM1.BLN"
+[[decided]]
+ext = "scn"
+decision = "exclude"
+date = "2026-11-22"
+example = "Users/Anthony-laptop/Desktop/desktop/Age Of Empires II+Age of Empires 2 - The Conquerors Expansion+stuff with online play/Age Of Empires II/GOODIES/DEMO.SCN"
+[[decided]]
+ext = "cpx"
+decision = "exclude"
+date = "2026-11-22"
+example = "Users/Anthony-laptop/Desktop/desktop/Age Of Empires II+Age of Empires 2 - The Conquerors Expansion+stuff with online play/Age of Empires 2 - The Conquerors Expansion/GAME/CAMPAIGN/XCAM1.CPX"
+[[decided]]
+ext = "scx"
+decision = "exclude"
+date = "2026-11-22"
+example = "Users/Anthony-laptop/Desktop/desktop/Age Of Empires II+Age of Empires 2 - The Conquerors Expansion+stuff with online play/Age of Empires 2 - The Conquerors Expansion/GOODIES/AOCDEMO.SCX"
+[[decided]]
+ext = "per"
+decision = "exclude"
+date = "2026-11-22"
+example = "Users/Anthony-laptop/Desktop/desktop/Age Of Empires II+Age of Empires 2 - The Conquerors Expansion+stuff with online play/Age of Empires 2 - The Conquerors Expansion/GOODIES/AISCRIPT/SAMPLEAI.PER"
+[[decided]]
+ext = "rms"
+decision = "exclude"
+date = "2026-11-22"
+example = "Users/Anthony-laptop/Desktop/desktop/Age Of Empires II+Age of Empires 2 - The Conquerors Expansion+stuff with online play/Age of Empires 2 - The Conquerors Expansion/GOODIES/RMSCRIPT/HALLOWED.RMS"
+[[decided]]
+ext = "bsb"
+decision = "exclude"
+date = "2026-11-22"
+example = "Users/Anthony-laptop/Desktop/desktop/Atlys_AC97_EDK_demo/project/system.bsb"
+[[decided]]
+ext = "make"
+decision = "exclude"
+date = "2026-11-22"
+example = "Users/Anthony-laptop/Desktop/desktop/Atlys_AC97_EDK_demo/project/system.make"
+[[decided]]
+ext = "mhs"
+decision = "exclude"
+date = "2026-11-22"
+example = "Users/Anthony-laptop/Desktop/desktop/Atlys_AC97_EDK_demo/project/system.mhs"
+[[decided]]
+ext = "xmp"
+decision = "exclude"
+date = "2026-11-22"
+example = "Users/Anthony-laptop/Desktop/desktop/Atlys_AC97_EDK_demo/project/system.xmp"
+[[decided]]
+ext = "prj"
+decision = "exclude"
+date = "2026-11-22"
+example = "Users/Anthony-laptop/Desktop/desktop/Atlys_AC97_EDK_demo/project/__xps/MCB_DDR2/mig.prj"
+[[decided]]
+ext = "ucf"
+decision = "exclude"
+date = "2026-11-22"
+example = "Users/Anthony-laptop/Desktop/desktop/Atlys_AC97_EDK_demo/project/__xps/MCB_DDR2/mig.ucf"
+[[decided]]
+ext = "xreport"
+decision = "exclude"
+date = "2026-11-22"
+example = "Users/Anthony-laptop/Desktop/desktop/Atlys_AC97_EDK_demo/project/__xps/ise/system.xreport"
+[[decided]]
+ext = "lst"
+decision = "exclude"
+date = "2026-11-22"
+example = "Users/Anthony-laptop/Desktop/desktop/Atlys_AC97_EDK_demo/project/__xps/ise/xmsgprops.lst"
+[[decided]]
+ext = "ut"
+decision = "exclude"
+date = "2026-11-22"
+example = "Users/Anthony-laptop/Desktop/desktop/Atlys_AC97_EDK_demo/project/etc/bitgen.ut"
+[[decided]]
+ext = "filters"
+decision = "exclude"
+date = "2026-11-22"
+example = "Users/Anthony-laptop/Desktop/desktop/Atlys_AC97_EDK_demo/project/etc/system.filters"
+[[decided]]
+ext = "gui"
+decision = "exclude"
+date = "2026-11-22"
+example = "Users/Anthony-laptop/Desktop/desktop/Atlys_AC97_EDK_demo/project/etc/system.gui"
+[[decided]]
+ext = "pao"
+decision = "exclude"
+date = "2026-11-22"
+example = "Users/Anthony-laptop/Desktop/desktop/Atlys_AC97_EDK_demo/project/pcores/d_ac97_axi_v1_10_a/data/d_ac97_axi_v2_1_0.pao"
+[[decided]]
+ext = "ld"
+decision = "exclude"
+date = "2026-11-22"
+example = "Users/Anthony-laptop/Desktop/desktop/Atlys_AC97_EDK_demo/source/lscript.ld"
+[[decided]]
+ext = "ctg"
+decision = "exclude"
+date = "2026-11-22"
+example = "Users/Anthony-laptop/Desktop/desktop/DCIM/CANONMSC/M0100.CTG"
+[[decided]]
+ext = "raw"
+decision = "exclude"
+date = "2026-11-22"
+example = "Users/Anthony-laptop/Desktop/desktop/HAUMONTECARLO/HAU_MONTE_CARLO_DYCY.raw"
+[[decided]]
+ext = "php"
+decision = "exclude"
+date = "2026-11-22"
+example = "Users/Anthony-laptop/Desktop/desktop/List of handtools for building furniture _files/css(1).php"
+[[decided]]
+ext = "rdf"
+decision = "exclude"
+date = "2026-11-22"
+example = "Users/Anthony-laptop/Desktop/desktop/Mathworks.Matlab.R2010a.ISO-TBE/win32/java/jre/win32/jre/lib/deploy/jqs/ff/install.rdf"
+[[decided]]
+ext = "xul"
+decision = "exclude"
+date = "2026-11-22"
+example = "Users/Anthony-laptop/Desktop/desktop/Mathworks.Matlab.R2010a.ISO-TBE/win32/java/jre/win32/jre/lib/deploy/jqs/ff/chrome/content/overlay.xul"
+[[decided]]
+ext = "w3g"
+decision = "exclude"
+date = "2026-11-22"
+example = "Users/Anthony-laptop/Desktop/desktop/Warcraft III_2/LastReplay.w3g"
+[[decided]]
+ext = "mpq"
+decision = "exclude"
+date = "2026-11-22"
+example = "Users/Anthony-laptop/Desktop/desktop/Warcraft III_2/War3Patch.mpq"
+[[decided]]
+ext = "bni"
+decision = "exclude"
+date = "2026-11-22"
+example = "Users/Anthony-laptop/Desktop/desktop/Warcraft III_2/icons-WAR3.bni"
+[[decided]]
+ext = "wai"
+decision = "exclude"
+date = "2026-11-22"
+example = "Users/Anthony-laptop/Desktop/desktop/Warcraft III_2/AI Scripts/GruntMaster.wai"
+[[decided]]
+ext = "w3n"
+decision = "exclude"
+date = "2026-11-22"
+example = "Users/Anthony-laptop/Desktop/desktop/Warcraft III_2/Campaigns/DemoCampaign.w3n"
+[[decided]]
+ext = "w3m"
+decision = "exclude"
+date = "2026-11-22"
+example = "Users/Anthony-laptop/Desktop/desktop/Warcraft III_2/Maps/(10)DustwallowKeys.w3m"
+[[decided]]
+ext = "w3x"
+decision = "exclude"
+date = "2026-11-22"
+example = "Users/Anthony-laptop/Desktop/desktop/Warcraft III_2/Maps/Download/Element TD 4.2e.w3x"
+[[decided]]
+ext = "tga"
+decision = "exclude"
+date = "2026-11-22"
+example = "Users/Anthony-laptop/Desktop/desktop/Warcraft III_2/Screenshots/WC3ScrnShot_041212_182122_01.tga"
+[[decided]]
+ext = "asi"
+decision = "exclude"
+date = "2026-11-22"
+example = "Users/Anthony-laptop/Desktop/desktop/Warcraft III_2/redist/miles/Mp3dec.asi"
+[[decided]]
+ext = "000"
+decision = "include"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Dropbox/school/Spring2011/EE375/experiment7/theSpiceOfLab/probeprb.000"
+[[decided]]
+ext = "001"
+decision = "include"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Dropbox/school/Spring2011/EE375/experiment7/theSpiceOfLab/probeprb.001"
+[[decided]]
+ext = "002"
+decision = "include"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Dropbox/school/Spring2011/EE375/experiment7/theSpiceOfLab/probeprb.002"
+[[decided]]
+ext = "003"
+decision = "include"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Dropbox/school/Spring2011/EE375/experiment7/theSpiceOfLab/probeprb.003"
+[[decided]]
+ext = "aps"
+decision = "include"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Documents/experiment5/experiment5.aps"
+[[decided]]
+ext = "asc"
+decision = "include"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Documents/school/EE308/hw3.asc"
+[[decided]]
+ext = "asp"
+decision = "include"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Downloads/RgConnect.asp"
+[[decided]]
+ext = "asy"
+decision = "include"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Desktop/desktop/spUpload/cores/adder.asy"
+[[decided]]
+ext = "atsln"
+decision = "include"
+date = "2026-11-23"
+example = "repo/clock/clock/clock.atsln"
+[[decided]]
+ext = "atsuo"
+decision = "exclude"
+date = "2026-11-23"
+example = "repo/clock/clock/clock.atsuo"
+[[decided]]
+ext = "attr"
+decision = "exclude"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Dropbox/ENGAGE!/.dropbox.attr"
+[[decided]]
+ext = "aup"
+decision = "include"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Desktop/muzak/dancing-SHORT.aup"
+[[decided]]
+ext = "aws"
+decision = "include"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Documents/experiment5/experiment5.aws"
+[[decided]]
+ext = "bash"
+decision = "include"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Downloads/PIC32_I2C_CodeExample_041613/PIC32_I2C_CodeExample/i2c_master.X/nbproject/Package-default.bash"
+[[decided]]
+ext = "bgn"
+decision = "exclude"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Desktop/desktop/keyboardDecoder/keydecoder.bgn"
+[[decided]]
+ext = "bit"
+decision = "include"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Desktop/desktop/keyboardDecoder/keydecoder.bit"
+[[decided]]
+ext = "bjt"
+decision = "include"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Downloads/standard.bjt"
+[[decided]]
+ext = "bmm"
+decision = "include"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Dropbox/school/sp/ISE12x/demos/nexys2/SDK/SDK_Export/hw/system_bd.bmm"
+[[decided]]
+ext = "bui"
+decision = "exclude"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Dropbox/school/sp/Atlys_BSB_Support_v_3_4/Digilent_AXI_IPCore_Support_v_1_31/ipxact/hurri/xilinx.com/bus_definitions/d_ac97_axi_v1_0/data/d_ac97_axi.bui"
+[[decided]]
+ext = "car"
+decision = "include"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/workspace/assignment1/autoInput.car"
+[[decided]]
+ext = "cdb"
+decision = "include"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Dropbox/school/Winter2012/EE459/myprojects_blank/cpee_student_coef/tone.cdb"
+[[decided]]
+ext = "cgc"
+decision = "include"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Desktop/desktop/spUpload/cores/coregen3.cgc"
+[[decided]]
+ext = "cgp"
+decision = "include"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Desktop/desktop/spUpload/cores/coregen.cgp"
+[[decided]]
+ext = "chk"
+decision = "include"
+date = "2026-11-23"
+example = "found.000/file0000.chk"
+[[decided]]
+ext = "cip"
+decision = "exclude"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Dropbox/school/sp/Atlys_BSB_Support_v_3_4/Atlys_PLB_BSB_Support/lib/Digilent/pcores/ac97_if_v1_10_a/devl/create.cip"
+[[decided]]
+ext = "cmake"
+decision = "include"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Downloads/Heimdall-master/Heimdall-master/cmake/Findlibusb.cmake"
+[[decided]]
+ext = "cmd_log"
+decision = "exclude"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Desktop/desktop/keyboardDecoder/keyDecoder.cmd_log"
+[[decided]]
+ext = "cmp"
+decision = "include"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Dropbox/nixieClock/kiCadPcb/clock.cmp"
+[[decided]]
+ext = "component"
+decision = "include"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/workspaceEE/assignment6/.settings/org.eclipse.wst.common.component"
+[[decided]]
+ext = "container"
+decision = "include"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/workspaceEE/assignment6/.settings/org.eclipse.wst.jsdt.ui.superType.container"
+[[decided]]
+ext = "cproj"
+decision = "include"
+date = "2026-11-23"
+example = "repo/clock/clock/clock/clock.cproj"
+[[decided]]
+ext = "crt"
+decision = "exclude"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Downloads/ca (1).crt"
+[[decided]]
+ext = "cui"
+decision = "exclude"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Dropbox/school/sp/Atlys_BSB_Support_v_3_4/Digilent_AXI_IPCore_Support_v_1_31/ipxact/hurri/xilinx.com/bridges/d_ac97_axi_template_bridges_v1_0/data/d_ac97_axi_template_io_bridge.cui"
+[[decided]]
+ext = "d"
+decision = "exclude"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Documents/school/EE336/Experiment1/default/dep/Experiment1.o.d"
+[[decided]]
+ext = "dbg"
+decision = "exclude"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Desktop/desktop/keyboardDecoder/isim/keyTester_isim_beh.exe.sim/ISimEngine-DesignHierarchy.dbg"
+[[decided]]
+ext = "dcr"
+decision = "exclude"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Downloads/wave_interference.dcr"
+[[decided]]
+ext = "diag"
+decision = "exclude"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Dropbox/school/Spring2012/EE455/EMProSimulations/ee_455_tutorial.ep/Simulations/000001/Run0001/project.diag"
+[[decided]]
+ext = "didat"
+decision = "exclude"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Desktop/desktop/keyboardDecoder/isim/keyTester_isim_beh.exe.sim/work/a_1717367259_3212880686.didat"
+[[decided]]
+ext = "drc"
+decision = "exclude"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Desktop/desktop/keyboardDecoder/keydecoder.drc"
+[[decided]]
+ext = "eep"
+decision = "include"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Documents/school/EE336/Experiment1/default/Experiment1.eep"
+[[decided]]
+ext = "ejp"
+decision = "exclude"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Desktop/desktop/spUpload/cores/clk_wiz_v3_3.ejp"
+[[decided]]
+ext = "elf"
+decision = "include"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Documents/school/EE336/Experiment1/default/Experiment1.elf"
+[[decided]]
+ext = "fab"
+decision = "exclude"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Desktop/desktop/spUpload/4pcb/pcb.fab"
+[[decided]]
+ext = "fda"
+decision = "exclude"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Desktop/desktop/spUpload/equalizerFirmwareRev1/filters/filters.fda"
+[[decided]]
+ext = "fft"
+decision = "include"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Dropbox/school/Spring2011/EE348/Experiment8/experiment8prelabAgain.fft"
+[[decided]]
+ext = "fzbox"
+decision = "include"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Dropbox/school/Spring2012/EE455/EMProSimulations/ee_455_tutorial.ep/Simulations/000008/Run0001/SteadyStateOutput/f0/system.fzbox"
+[[decided]]
+ext = "gise"
+decision = "include"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Desktop/desktop/keyboardDecoder/keyboardDecoder.gise"
+[[decided]]
+ext = "gld"
+decision = "include"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Dropbox/HCT/p33EP512MU810_emc4.gld"
+[[decided]]
+ext = "h54"
+decision = "exclude"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Dropbox/school/Winter2012/EE459/myprojects_blank/cpee_student_coef/tonecfg.h54"
+[[decided]]
+ext = "hex"
+decision = "include"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Documents/school/EE336/Experiment1/default/Experiment1.hex"
+[[decided]]
+ext = "i2cmaster"
+decision = "include"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Dropbox/nixieClock/i2cMaster/makefile.i2cmaster"
+[[decided]]
+ext = "idb"
+decision = "exclude"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Documents/Visual Studio 2012/Projects/ConsoleApplication1/ConsoleApplication1/Debug/vc110.idb"
+[[decided]]
+ext = "ilk"
+decision = "exclude"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Documents/Visual Studio 2012/Projects/ConsoleApplication1/Debug/ConsoleApplication1.ilk"
+[[decided]]
+ext = "imp"
+decision = "exclude"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Dropbox/school/Spring2012/EE455/EMProSimulations/ee_455_tutorial.ep/Simulations/000001/Run0001/project.p1.a1.imp"
+[[decided]]
+ext = "in"
+decision = "exclude"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Desktop/desktop/spUpload/equalizerFirmwareRev1/filters/9/tmp/_cg/xil_6380_5.in"
+[[decided]]
+ext = "inc"
+decision = "include"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Downloads/PIC32_I2C_CodeExample_041613/PIC32_I2C_CodeExample/i2c_master.X/.dep.inc"
+[[decided]]
+ext = "info"
+decision = "exclude"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Dropbox/school/Spring2012/EE455/EMProSimulations/ee_455_tutorial.ep/Simulations/000001/project.info"
+[[decided]]
+ext = "input"
+decision = "exclude"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Dropbox/school/Spring2012/EE455/EMProSimulations/ee_455_tutorial.ep/Simulations/000001/Run0001/geometry.input"
+[[decided]]
+ext = "ipa"
+decision = "exclude"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Music/iTunes/Mobile Applications/3D Coaster.ipa"
+[[decided]]
+ext = "ipch"
+decision = "exclude"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Documents/Visual Studio 2012/Projects/tickTockImTheClock/ipch/ticktockimtheclock-f6d2d931/ticktockimtheclock-45f75eab.ipch"
+[[decided]]
+ext = "ipd"
+decision = "include"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Documents/BlackBerry/Backup/BlackBerry Torch 9800.ipd"
+[[decided]]
+ext = "ise"
+decision = "include"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Desktop/desktop/keyboardDecoder/keyboardDecoder.ise"
+[[decided]]
+ext = "itc"
+decision = "exclude"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Music/iTunes/Album Artwork/Local/E14234848D436DC7/00/03/03/E14234848D436DC7-463E9C97BBA36330.itc"
+[[decided]]
+ext = "java"
+decision = "include"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Downloads/CIS35bLab2/CIS35bLab2/src/AutoDriver.java"
+[[decided]]
+ext = "jnt"
+decision = "include"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Dropbox/school/Spring2011/EE375/experiment7/EE375_Exp7/calc1.jnt"
+[[decided]]
+ext = "jsp"
+decision = "include"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Downloads/formAction.jsp"
+[[decided]]
+ext = "kml"
+decision = "include"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Downloads/doc.kml"
+[[decided]]
+ext = "lastbuildstate"
+decision = "exclude"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Documents/Visual Studio 2012/Projects/ConsoleApplication1/ConsoleApplication1/Debug/ConsoleApplication1.lastbuildstate"
+[[decided]]
+ext = "lct"
+decision = "exclude"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Dropbox/school/Spring2012/EE425/homework1/A.LCT"
+[[decided]]
+ext = "lkf"
+decision = "exclude"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Dropbox/school/Winter2012/EE459/myprojects_blank/cpee_student_coef/Debug.lkf"
+[[decided]]
+ext = "lkv"
+decision = "exclude"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Dropbox/school/Winter2012/EE459/myprojects_blank/cpee_student_coef/Debug.lkv"
+[[decided]]
+ext = "localstorage"
+decision = "exclude"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Desktop/desktop/bbbackup/BLACKBERRY1/BlackBerry/system/appdata/rim/webstorage/net_rim_bb_browser_daemon/localstorage/http_ajblogs.disqus.com_0.localstorage"
+[[decided]]
+ext = "lock"
+decision = "exclude"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Desktop/desktop/keyboardDecoder/keyboardDecoder_xdb/tmp/ise.lock"
+[[decided]]
+ext = "lso"
+decision = "exclude"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Desktop/desktop/keyboardDecoder/keyDecoder.lso"
+[[decided]]
+ext = "lss"
+decision = "exclude"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Documents/school/EE336/Experiment1/default/Experiment1.lss"
+[[decided]]
+ext = "m4p"
+decision = "include"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Music/iTunes/Previous iTunes Libraries/Album Artwork/iTunes Music/Compilations/Alabama_ Greatest Hits, Vol. 3/10 I'm in a Hurry (And Don't Know Wh.m4p"
+[[decided]]
+ext = "mat"
+decision = "include"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Desktop/desktop/dataMassaging/waveform12.mat"
+[[decided]]
+ext = "mcp"
+decision = "include"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Downloads/PIC32_I2C_CodeExample_041613/PIC32_I2C_CodeExample/i2c_master.mcp"
+[[decided]]
+ext = "mdd"
+decision = "include"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Dropbox/school/sp/Atlys_BSB_Support_v_3_4/Atlys_PLB_BSB_Support/lib/Digilent/drivers/quad_spi_v1_00_a/data/quad_spi_v2_1_0.mdd"
+[[decided]]
+ext = "mdl"
+decision = "include"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Dropbox/school/Winter2012/EE459/project5/directform2.mdl"
+[[decided]]
+ext = "mime:text/troff"
+decision = "include"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Documents/school/EE347/prelab1-7"
+[[decided]]
+ext = "mk"
+decision = "include"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Downloads/PIC32_I2C_CodeExample_041613/PIC32_I2C_CodeExample/i2c_master.X/nbproject/Makefile-default.mk"
+[[decided]]
+ext = "mrp"
+decision = "exclude"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Desktop/desktop/keyboardDecoder/keyDecoder_map.mrp"
+[[decided]]
+ext = "ms12"
+decision = "exclude"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Dropbox/school/Spring2012/EE425/homework4/1-a.ms12"
+[[decided]]
+ext = "msdvd"
+decision = "include"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Videos/missourtTrip.msdvd"
+[[decided]]
+ext = "mss"
+decision = "exclude"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Dropbox/school/sp/ISE11x/demos/basys2/system.mss"
+[[decided]]
+ext = "msu"
+decision = "exclude"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Downloads/vs2012wdx/packages/localdbMsu/Windows6.1-KB2664825-v3-x64.msu"
+[[decided]]
+ext = "mswmm"
+decision = "include"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Videos/Untitled.MSWMM"
+[[decided]]
+ext = "name"
+decision = "include"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/workspaceEE/assignment6/.settings/org.eclipse.wst.jsdt.ui.superType.name"
+[[decided]]
+ext = "ncd"
+decision = "exclude"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Desktop/desktop/keyboardDecoder/keyDecoder.ncd"
+[[decided]]
+ext = "ncf"
+decision = "exclude"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Desktop/desktop/spUpload/cores/clk_wiz_v3_3_exdes.ncf"
+[[decided]]
+ext = "ngc"
+decision = "exclude"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Desktop/desktop/keyboardDecoder/keyDecoder.ngc"
+[[decided]]
+ext = "ngd"
+decision = "exclude"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Desktop/desktop/keyboardDecoder/keyDecoder.ngd"
+[[decided]]
+ext = "ngm"
+decision = "exclude"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Desktop/desktop/keyboardDecoder/keyDecoder_map.ngm"
+[[decided]]
+ext = "ngr"
+decision = "exclude"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Desktop/desktop/keyboardDecoder/keyDecoder.ngr"
+[[decided]]
+ext = "ntrc_log"
+decision = "exclude"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Desktop/desktop/keyboardDecoder/keyboardDecoder.ntrc_log"
+[[decided]]
+ext = "obj"
+decision = "exclude"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Desktop/desktop/keyboardDecoder/isim/keyTester_isim_beh.exe.sim/work/a_1717367259_3212880686.nt.obj"
+[[decided]]
+ext = "opensdf"
+decision = "exclude"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Documents/Visual Studio 2012/Projects/ConsoleApplication1/ConsoleApplication1.opensdf"
+[[decided]]
+ext = "palib"
+decision = "include"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Downloads/1N914A.palib"
+[[decided]]
+ext = "pcb"
+decision = "include"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Desktop/desktop/spUpload/4pcb/pcb.pcb"
+[[decided]]
+ext = "pcf"
+decision = "exclude"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Desktop/desktop/keyboardDecoder/keyDecoder.pcf"
+[[decided]]
+ext = "pch"
+decision = "exclude"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Documents/Visual Studio 2012/Projects/tickTockImTheClock/tickTockImTheClock/Debug/tickTockImTheClock.pch"
+[[decided]]
+ext = "pde"
+decision = "include"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Dropbox/nixieClock/Arduino/dsRTC_Tester/dsRTC_Tester.pde"
+[[decided]]
+ext = "pdis"
+decision = "include"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Dropbox/school/Spring2012/EE455/EMProSimulations/ee_455_tutorial.ep/Simulations/000008/Run0001/SteadyStateOutput/f0/system.pdis"
+[[decided]]
+ext = "pin"
+decision = "exclude"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Dropbox/school/Spring2012/EE455/EMProSimulations/ee_455_tutorial.ep/Simulations/000001/Run0001/CircuitComponent_port1_0.pin"
+[[decided]]
+ext = "pjt"
+decision = "include"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Dropbox/school/Winter2012/EE459/myprojects_blank/cpee_student_coef/tone.pjt"
+[[decided]]
+ext = "plib"
+decision = "include"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Documents/Texas Instruments/ProFramework/ProTools/PartsLibrary/MyParts.plib"
+[[decided]]
+ext = "ploss"
+decision = "include"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Dropbox/school/Spring2012/EE455/EMProSimulations/ee_455_tutorial.ep/Simulations/000001/Run0001/CircuitComponent_port2_1.ploss"
+[[decided]]
+ext = "pls"
+decision = "include"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Downloads/listen.pls"
+[[decided]]
+ext = "plt"
+decision = "include"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Dropbox/school/Spring2011/EE375/experiment3/spiceSimulation/experiment3-part1a.plt"
+[[decided]]
+ext = "prad"
+decision = "include"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Dropbox/school/Spring2012/EE455/EMProSimulations/ee_455_tutorial.ep/Simulations/000008/Run0001/SteadyStateOutput/f0/system.prad"
+[[decided]]
+ext = "pro"
+decision = "include"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Dropbox/nixieClock/kiCadPcb/clock.pro"
+[[decided]]
+ext = "projectmgr"
+decision = "exclude"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Desktop/desktop/project/iseconfig/Audio.projectmgr"
+[[decided]]
+ext = "ptwx"
+decision = "exclude"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Desktop/desktop/keyboardDecoder/keyDecoder.ptwx"
+[[decided]]
+ext = "qrc"
+decision = "include"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Downloads/Heimdall-master/Heimdall-master/heimdall-frontend/mainwindow.qrc"
+[[decided]]
+ext = "rc"
+decision = "include"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Documents/Visual Studio 2012/Projects/tickTockImTheClock/tickTockImTheClock/tickTockImTheClock.rc"
+[[decided]]
+ext = "ref"
+decision = "exclude"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Desktop/desktop/keyboardDecoder/xst/work/hdllib.ref"
+[[decided]]
+ext = "res"
+decision = "exclude"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Documents/Visual Studio 2012/Projects/tickTockImTheClock/tickTockImTheClock/Debug/tickTockImTheClock.res"
+[[decided]]
+ext = "rtd"
+decision = "include"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Dropbox/school/Winter2012/EE459/myprojects_blank/logfile.rtd"
+[[decided]]
+ext = "rules"
+decision = "include"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Downloads/Heimdall-master/Heimdall-master/heimdall/60-heimdall.rules"
+[[decided]]
+ext = "s"
+decision = "include"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Dropbox/nixieClock/i2cMaster/i2cmaster.S"
+[[decided]]
+ext = "s11"
+decision = "include"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Dropbox/school/Spring2012/EE455/EMProSimulations/ee_455_tutorial.ep/Simulations/000001/Run0001/project.s11"
+[[decided]]
+ext = "s21"
+decision = "include"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Dropbox/school/Spring2012/EE455/EMProSimulations/ee_455_tutorial.ep/Simulations/000001/Run0001/project.s21"
+[[decided]]
+ext = "s54"
+decision = "exclude"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Dropbox/school/Winter2012/EE459/myprojects_blank/cpee_student_coef/tonecfg.s54"
+[[decided]]
+ext = "sdbl"
+decision = "exclude"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Desktop/desktop/project/xst/work/work.sdbl"
+[[decided]]
+ext = "sdbx"
+decision = "exclude"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Desktop/desktop/project/xst/work/work.sdbx"
+[[decided]]
+ext = "sdf"
+decision = "exclude"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Documents/Visual Studio 2012/Projects/ConsoleApplication1/ConsoleApplication1.sdf"
+[[decided]]
+ext = "ser"
+decision = "include"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/workspace/assignment1/testDrive.ser"
+[[decided]]
+ext = "sln"
+decision = "include"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Documents/Visual Studio 2012/Projects/ConsoleApplication1/ConsoleApplication1.sln"
+[[decided]]
+ext = "spl"
+decision = "exclude"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Desktop/desktop/spUpload/equalizerFirmwareRev1/adcDriver.spl"
+[[decided]]
+ext = "srec"
+decision = "include"
+date = "2026-11-23"
+example = "repo/clock/clock/clock/Debug/clock.srec"
+[[decided]]
+ext = "ssout"
+decision = "include"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Dropbox/school/Spring2012/EE455/EMProSimulations/ee_455_tutorial.ep/Simulations/000008/Run0001/SteadyStateOutput/f0/system.ssout"
+[[decided]]
+ext = "stx"
+decision = "exclude"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Desktop/desktop/spUpload/equalizerFirmwareRev1/codecDriver.stx"
+[[decided]]
+ext = "suo"
+decision = "exclude"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Documents/Visual Studio 2012/Projects/ConsoleApplication1/ConsoleApplication1.v11.suo"
+[[decided]]
+ext = "sv"
+decision = "include"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Desktop/desktop/spUpload/cores/clk_wiz_v3_3/simulation/functional/wave.sv"
+[[decided]]
+ext = "sym"
+decision = "include"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Desktop/desktop/spUpload/cores/fir_compiler_v5_0.sym"
+[[decided]]
+ext = "symlog"
+decision = "exclude"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Desktop/desktop/spUpload/equalizerFirmwareRev1/clockDivider.symlog"
+[[decided]]
+ext = "syr"
+decision = "exclude"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Desktop/desktop/keyboardDecoder/keyDecoder.syr"
+[[decided]]
+ext = "tcf"
+decision = "include"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Dropbox/school/Winter2012/EE459/myprojects_blank/cpee_student_coef/tone.tcf"
+[[decided]]
+ext = "tlog"
+decision = "exclude"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Documents/Visual Studio 2012/Projects/ConsoleApplication1/ConsoleApplication1/Debug/CL.read.1.tlog"
+[[decided]]
+ext = "torrent"
+decision = "exclude"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Downloads/[kickass.so]the.gun.digest.book.of.modern.gun.values.2013.17.ed.torrent"
+[[decided]]
+ext = "tr0"
+decision = "include"
+date = "2026-11-23"
+example = "Users/Public/Documents/My M1/M1 WaveformViewer Data/aoi.W.tr0"
+[[decided]]
+ext = "twimaster"
+decision = "include"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Dropbox/nixieClock/i2cMaster/makefile.twimaster"
+[[decided]]
+ext = "twr"
+decision = "exclude"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Desktop/desktop/keyboardDecoder/keyDecoder.twr"
+[[decided]]
+ext = "twx"
+decision = "exclude"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Desktop/desktop/keyboardDecoder/keyDecoder.twx"
+[[decided]]
+ext = "ui"
+decision = "include"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Downloads/Heimdall-master/Heimdall-master/heimdall-frontend/aboutform.ui"
+[[decided]]
+ext = "unroutes"
+decision = "exclude"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Desktop/desktop/keyboardDecoder/keyDecoder.unroutes"
+[[decided]]
+ext = "ut_quad_spi"
+decision = "include"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Dropbox/school/sp/Atlys_BSB_Support_v_3_4/Atlys_PLB_BSB_Support/lib/Digilent/boards/Digilent_Atlys/data/bitgen.ut_quad_spi"
+[[decided]]
+ext = "vc"
+decision = "include"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Dropbox/school/Spring2012/EE455/EMProSimulations/ee_455_tutorial.ep/Simulations/000001/Run0001/CircuitComponent_port1_0.vc"
+[[decided]]
+ext = "vcxproj"
+decision = "include"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Documents/Visual Studio 2012/Projects/ConsoleApplication1/ConsoleApplication1/ConsoleApplication1.vcxproj"
+[[decided]]
+ext = "vdb"
+decision = "exclude"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Desktop/desktop/keyboardDecoder/isim/work/keydecoder.vdb"
+[[decided]]
+ext = "vdbl"
+decision = "exclude"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Desktop/desktop/spUpload/equalizerFirmwareRev1/interface/xst/work/work.vdbl"
+[[decided]]
+ext = "vdbx"
+decision = "exclude"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Desktop/desktop/spUpload/equalizerFirmwareRev1/interface/xst/work/work.vdbx"
+[[decided]]
+ext = "vho"
+decision = "include"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Desktop/desktop/keyboardDecoder/xst/work/sub00/vhpl00.vho"
+[[decided]]
+ext = "vmcx"
+decision = "exclude"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Virtual Machines/Windows XP Mode.vmcx"
+[[decided]]
+ext = "vssettings"
+decision = "exclude"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Documents/Atmel Studio/Settings/Atmel Studio/CurrentSettings-2014-02-12.vssettings"
+[[decided]]
+ext = "wav-filtereded_highpass"
+decision = "include"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Dropbox/school/Winter2012/EE459/Zarathustra.wav-Filtereded_highpass"
+[[decided]]
+ext = "wcfg"
+decision = "include"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Desktop/desktop/spUpload/equalizerFirmwareRev1/bleh.wcfg"
+[[decided]]
+ext = "wdb"
+decision = "exclude"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Desktop/desktop/keyboardDecoder/keyTester_isim_beh.wdb"
+[[decided]]
+ext = "wks"
+decision = "include"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Dropbox/school/Winter2012/EE459/myprojects_blank/cpee_student_diffeq/EmulatorResetTemp.wks"
+[[decided]]
+ext = "wlmp"
+decision = "include"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Desktop/desktop/weddingSlideShow/largeSlideShow.wlmp"
+[[decided]]
+ext = "xbcd"
+decision = "exclude"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Desktop/desktop/keyboardDecoder/keyboardDecoder_xdb/cst.xbcd"
+[[decided]]
+ext = "xbd"
+decision = "include"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Dropbox/school/sp/Atlys_BSB_Support_v_3_4/Atlys_PLB_BSB_Support/lib/Digilent/boards/Digilent_Atlys/data/Digilent_Atlys_v2_2_0.xbd"
+[[decided]]
+ext = "xco"
+decision = "include"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Desktop/desktop/spUpload/cores/adder.xco"
+[[decided]]
+ext = "xdc"
+decision = "include"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Desktop/desktop/spUpload/cores/clk_wiz_v3_3/clk_wiz_v3_3.xdc"
+[[decided]]
+ext = "xdl"
+decision = "exclude"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Desktop/desktop/spUpload/equalizerFirmwareRev1/audioProcessor.xdl"
+[[decided]]
+ext = "xise"
+decision = "include"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Desktop/desktop/keyboardDecoder/keyboardDecoder.xise"
+[[decided]]
+ext = "xmsgs"
+decision = "exclude"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Desktop/desktop/keyboardDecoder/_xmsgs/bitgen.xmsgs"
+[[decided]]
+ext = "xpi"
+decision = "exclude"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Desktop/desktop/keyboardDecoder/keyDecoder.xpi"
+[[decided]]
+ext = "xrpt"
+decision = "exclude"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Desktop/desktop/keyboardDecoder/keyDecoder_map.xrpt"
+[[decided]]
+ext = "xsim"
+decision = "exclude"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Dropbox/school/Spring2012/EE455/EMProSimulations/ee_455_tutorial.ep/Simulations/000001/project.xsim"
+[[decided]]
+ext = "xst"
+decision = "exclude"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Desktop/desktop/keyboardDecoder/keyDecoder.xst"
+[[decided]]
+ext = "xwbt"
+decision = "exclude"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Desktop/desktop/project/main_bitgen.xwbt"
+[[decided]]
+ext = "xz"
+decision = "include"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Downloads/linux-3.13.tar.xz"
+[[decided]]
+ext = "zipw"
+decision = "exclude"
+date = "2026-11-23"
+example = "Users/Anthony-laptop/Desktop/desktop/keyboardDecoder/keyboardDecoderAnthonyGiardina.zipW"
+[[decided]]
+ext = "mime:application/x-compress-ttcomp"
+decision = "exclude"
+date = "2026-11-23"
+example = "home/anthony/.ICEauthority"
+[[decided]]
+ext = "data"
+decision = "exclude"
+date = "2026-11-23"
+example = "home/anthony/.Skype/DataRv/offline-storage.data"
+[[decided]]
+ext = "db-journal"
+decision = "exclude"
+date = "2026-11-23"
+example = "home/anthony/.Skype/agcomptec/bistats.db-journal"
+[[decided]]
+ext = "last"
+decision = "exclude"
+date = "2026-11-23"
+example = "home/anthony/.cinnamon/glass.log.last"
+[[decided]]
+ext = "desktop"
+decision = "exclude"
+date = "2026-11-23"
+example = "home/anthony/.gnome/apps/chrome-aohghmighlieiainnegkcijnfilokake-Default.desktop"
+[[decided]]
+ext = "mime:application/vnd.sqlite3"
+decision = "exclude"
+date = "2026-11-23"
+example = "home/anthony/.googleearth/Cache/cookies"
+[[decided]]
+ext = "sst"
+decision = "exclude"
+date = "2026-11-23"
+example = "home/anthony/.googleearth/Cache/unified_cache_leveldb_leveldb2/000045.sst"
+[[decided]]
+ext = "mime:audio/x-mp4a-latm"
+decision = "exclude"
+date = "2026-11-23"
+example = "home/anthony/.googleearth/Cache/unified_cache_leveldb_leveldb2/MANIFEST-000002"
+[[decided]]
+ext = "xbel"
+decision = "exclude"
+date = "2026-11-23"
+example = "home/anthony/.local/share/recently-used.xbel"
+[[decided]]
+ext = "vdf"
+decision = "exclude"
+date = "2026-11-23"
+example = "home/anthony/.local/share/Steam/appcache/appinfo.vdf"
+[[decided]]
+ext = "modules"
+decision = "exclude"
+date = "2026-11-23"
+example = "home/anthony/.local/share/Steam/bin/panorama/etc/pango/pango.modules"
+[[decided]]
+ext = "frag"
+decision = "exclude"
+date = "2026-11-23"
+example = "home/anthony/.local/share/Steam/bin/shaders/tenfoot/opengl/fancyquaduber.frag"
+[[decided]]
+ext = "vert"
+decision = "exclude"
+date = "2026-11-23"
+example = "home/anthony/.local/share/Steam/bin/shaders/tenfoot/opengl/fancyquaduber.vert"
+[[decided]]
+ext = "mime:font/woff"
+decision = "exclude"
+date = "2026-11-23"
+example = "home/anthony/.local/share/Steam/config/htmlcache/f_000008"
+[[decided]]
+ext = "cache-3"
+decision = "exclude"
+date = "2026-11-23"
+example = "home/anthony/.local/share/Steam/fontconfig/04aabc0a78ac019cf9454389977116d2-le32d4.cache-3"
+[[decided]]
+ext = "layout"
+decision = "exclude"
+date = "2026-11-23"
+example = "home/anthony/.local/share/Steam/friends/setnicknamedialog.layout"
+[[decided]]
+ext = "installed"
+decision = "exclude"
+date = "2026-11-23"
+example = "home/anthony/.local/share/Steam/package/steam_client_ubuntu12.installed"
+[[decided]]
+ext = "menu"
+decision = "exclude"
+date = "2026-11-23"
+example = "home/anthony/.local/share/Steam/resource/menus/friends.menu"
+[[decided]]
+ext = "styles"
+decision = "exclude"
+date = "2026-11-23"
+example = "home/anthony/.local/share/Steam/resource/styles/gameoverlay.styles"
+[[decided]]
+ext = "uifont"
+decision = "exclude"
+date = "2026-11-23"
+example = "home/anthony/.local/share/Steam/tenfoot/resource/fonts/tenfoot.uifont"
+[[decided]]
+ext = "webm"
+decision = "exclude"
+date = "2026-11-23"
+example = "home/anthony/.local/share/Steam/tenfoot/resource/images/intro_movie.webm"
+[[decided]]
+ext = "dic"
+decision = "exclude"
+date = "2026-11-23"
+example = "home/anthony/.local/share/Steam/tenfoot/resource/wordlists/brazilian_compiled_words.dic"
+[[decided]]
+ext = "pak"
+decision = "exclude"
+date = "2026-11-23"
+example = "home/anthony/.local/share/Steam/ubuntu12_32/cef.pak"
+[[decided]]
+ext = "crypt"
+decision = "exclude"
+date = "2026-11-23"
+example = "home/anthony/.local/share/Steam/ubuntu12_32/libav_h264.so.56.crypt"
+[[decided]]
+ext = "56"
+decision = "exclude"
+date = "2026-11-23"
+example = "home/anthony/.local/share/Steam/ubuntu12_32/libavcodec.so.56"
+[[decided]]
+ext = "54"
+decision = "exclude"
+date = "2026-11-23"
+example = "home/anthony/.local/share/Steam/ubuntu12_32/libavutil.so.54"
+[[decided]]
+ext = "flt"
+decision = "exclude"
+date = "2026-11-23"
+example = "home/anthony/.local/share/Steam/ubuntu12_32/mssdsp.flt"
+[[decided]]
+ext = "mix"
+decision = "exclude"
+date = "2026-11-23"
+example = "home/anthony/.local/share/Steam/ubuntu12_32/mssmixer.mix"
+[[decided]]
+ext = "checksum"
+decision = "exclude"
+date = "2026-11-23"
+example = "home/anthony/.local/share/Steam/ubuntu12_32/steam-runtime.checksum"
+[[decided]]
+ext = "part0"
+decision = "exclude"
+date = "2026-11-23"
+example = "home/anthony/.local/share/Steam/ubuntu12_32/steam-runtime.tar.xz.part0"
+[[decided]]
+ext = "part1"
+decision = "exclude"
+date = "2026-11-23"
+example = "home/anthony/.local/share/Steam/ubuntu12_32/steam-runtime.tar.xz.part1"
+[[decided]]
+ext = "gitc28f1bab-1+srt4_amd64"
+decision = "exclude"
+date = "2026-11-23"
+example = "home/anthony/.local/share/Steam/ubuntu12_32/steam-runtime/amd64/installed/librtmp0_2.4~20110711.gitc28f1bab-1+srt4_amd64"
+[[decided]]
+ext = "q-21+srt4_amd64"
+decision = "exclude"
+date = "2026-11-23"
+example = "home/anthony/.local/share/Steam/ubuntu12_32/steam-runtime/amd64/installed/libwrap0_7.6.q-21+srt4_amd64"
+[[decided]]
+ext = "dfsg-3ubuntu4+srt4_amd64"
+decision = "exclude"
+date = "2026-11-23"
+example = "home/anthony/.local/share/Steam/ubuntu12_32/steam-runtime/amd64/installed/zlib1g_1.2.3.4.dfsg-3ubuntu4+srt4_amd64"
+[[decided]]
+ext = "mime:text/x-perl"
+decision = "exclude"
+date = "2026-11-23"
+example = "home/anthony/.local/share/Steam/ubuntu12_32/steam-runtime/amd64/usr/bin/gdialog"
+[[decided]]
+ext = "08004"
+decision = "exclude"
+date = "2026-11-23"
+example = "home/anthony/.local/share/Steam/ubuntu12_32/steam-runtime/amd64/usr/lib/x86_64-linux-gnu/libGLU.so.1.3.08004"
+[[decided]]
+ext = "dir"
+decision = "exclude"
+date = "2026-11-23"
+example = "home/anthony/.local/share/Steam/ubuntu12_32/steam-runtime/amd64/usr/share/X11/locale/compose.dir"
+[[decided]]
+ext = "alias"
+decision = "exclude"
+date = "2026-11-23"
+example = "home/anthony/.local/share/Steam/ubuntu12_32/steam-runtime/amd64/usr/share/X11/locale/locale.alias"
+[[decided]]
+ext = "alisp"
+decision = "exclude"
+date = "2026-11-23"
+example = "home/anthony/.local/share/Steam/ubuntu12_32/steam-runtime/amd64/usr/share/alsa/sndo-mixer.alisp"
+[[decided]]
+ext = "example"
+decision = "exclude"
+date = "2026-11-23"
+example = "home/anthony/.local/share/Steam/ubuntu12_32/steam-runtime/amd64/usr/share/alsa/alsa.conf.d/99-pulseaudio-default.conf.example"
+[[decided]]
+ext = "debian"
+decision = "exclude"
+date = "2026-11-23"
+example = "home/anthony/.local/share/Steam/ubuntu12_32/steam-runtime/amd64/usr/share/doc/gcc-4.6-base/README.Debian"
+[[decided]]
+ext = "amd64"
+decision = "exclude"
+date = "2026-11-23"
+example = "home/anthony/.local/share/Steam/ubuntu12_32/steam-runtime/amd64/usr/share/doc/gtk2-engines-pixbuf/changelog.Debian.amd64"
+[[decided]]
+ext = "conf_pulse"
+decision = "exclude"
+date = "2026-11-23"
+example = "home/anthony/.local/share/Steam/ubuntu12_32/steam-runtime/amd64/usr/share/doc/libasound2-plugins/examples/a52.conf_pulse"
+[[decided]]
+ext = "conf_jack"
+decision = "exclude"
+date = "2026-11-23"
+example = "home/anthony/.local/share/Steam/ubuntu12_32/steam-runtime/amd64/usr/share/doc/libasound2-plugins/examples/asound.conf_jack"
+[[decided]]
+ext = "conf_oss"
+decision = "exclude"
+date = "2026-11-23"
+example = "home/anthony/.local/share/Steam/ubuntu12_32/steam-runtime/amd64/usr/share/doc/libasound2-plugins/examples/asound.conf_oss"
+[[decided]]
+ext = "configure-options"
+decision = "exclude"
+date = "2026-11-23"
+example = "home/anthony/.local/share/Steam/ubuntu12_32/steam-runtime/amd64/usr/share/doc/libsasl2-2/README.configure-options"
+[[decided]]
+ext = "mime:text/x-c"
+decision = "exclude"
+date = "2026-11-23"
+example = "home/anthony/.local/share/Steam/ubuntu12_32/steam-runtime/amd64/usr/share/doc/libsdl-image1.2/README"
+[[decided]]
+ext = "buffer_lighting"
+decision = "exclude"
+date = "2026-11-23"
+example = "home/anthony/.local/share/Steam/ubuntu12_32/steam-runtime/amd64/usr/share/doc/nvidia-cg-toolkit/examples/OpenGL/advanced/buffer_lighting/Makefile.buffer_lighting"
+[[decided]]
+ext = "cg"
+decision = "exclude"
+date = "2026-11-23"
+example = "home/anthony/.local/share/Steam/ubuntu12_32/steam-runtime/amd64/usr/share/doc/nvidia-cg-toolkit/examples/OpenGL/advanced/buffer_lighting/buffer_lighting.cg"
+[[decided]]
+ext = "cgfx_boxfilter"
+decision = "exclude"
+date = "2026-11-23"
+example = "home/anthony/.local/share/Steam/ubuntu12_32/steam-runtime/amd64/usr/share/doc/nvidia-cg-toolkit/examples/OpenGL/advanced/cgfx_boxfilter/Makefile.cgfx_boxfilter"
+[[decided]]
+ext = "cgfx_buffer_lighting"
+decision = "exclude"
+date = "2026-11-23"
+example = "home/anthony/.local/share/Steam/ubuntu12_32/steam-runtime/amd64/usr/share/doc/nvidia-cg-toolkit/examples/OpenGL/advanced/cgfx_buffer_lighting/Makefile.cgfx_buffer_lighting"
+[[decided]]
+ext = "cgfx_bumpdemo"
+decision = "exclude"
+date = "2026-11-23"
+example = "home/anthony/.local/share/Steam/ubuntu12_32/steam-runtime/amd64/usr/share/doc/nvidia-cg-toolkit/examples/OpenGL/advanced/cgfx_bumpdemo/Makefile.cgfx_bumpdemo"
+[[decided]]
+ext = "cgfx_bumpdemo2"
+decision = "exclude"
+date = "2026-11-23"
+example = "home/anthony/.local/share/Steam/ubuntu12_32/steam-runtime/amd64/usr/share/doc/nvidia-cg-toolkit/examples/OpenGL/advanced/cgfx_bumpdemo/Makefile.cgfx_bumpdemo2"
+[[decided]]
+ext = "cgfx"
+decision = "exclude"
+date = "2026-11-23"
+example = "home/anthony/.local/share/Steam/ubuntu12_32/steam-runtime/amd64/usr/share/doc/nvidia-cg-toolkit/examples/OpenGL/advanced/cgfx_bumpdemo/bumpdemo.cgfx"
+[[decided]]
+ext = "cgfx_bumpdemo_array"
+decision = "exclude"
+date = "2026-11-23"
+example = "home/anthony/.local/share/Steam/ubuntu12_32/steam-runtime/amd64/usr/share/doc/nvidia-cg-toolkit/examples/OpenGL/advanced/cgfx_bumpdemo_array/Makefile.cgfx_bumpdemo_array"
+[[decided]]
+ext = "cgfx_interfaces"
+decision = "exclude"
+date = "2026-11-23"
+example = "home/anthony/.local/share/Steam/ubuntu12_32/steam-runtime/amd64/usr/share/doc/nvidia-cg-toolkit/examples/OpenGL/advanced/cgfx_interfaces/Makefile.cgfx_interfaces"
+[[decided]]
+ext = "cgfx_latest"
+decision = "exclude"
+date = "2026-11-23"
+example = "home/anthony/.local/share/Steam/ubuntu12_32/steam-runtime/amd64/usr/share/doc/nvidia-cg-toolkit/examples/OpenGL/advanced/cgfx_latest/Makefile.cgfx_latest"
+[[decided]]
+ext = "cgfx_procfx"
+decision = "exclude"
+date = "2026-11-23"
+example = "home/anthony/.local/share/Steam/ubuntu12_32/steam-runtime/amd64/usr/share/doc/nvidia-cg-toolkit/examples/OpenGL/advanced/cgfx_procfx/Makefile.cgfx_procfx"
+[[decided]]
+ext = "cgfx_tessellation"
+decision = "exclude"
+date = "2026-11-23"
+example = "home/anthony/.local/share/Steam/ubuntu12_32/steam-runtime/amd64/usr/share/doc/nvidia-cg-toolkit/examples/OpenGL/advanced/cgfx_tessellation/Makefile.cgfx_tessellation"
+[[decided]]
+ext = "cgfx_texture_array"
+decision = "exclude"
+date = "2026-11-23"
+example = "home/anthony/.local/share/Steam/ubuntu12_32/steam-runtime/amd64/usr/share/doc/nvidia-cg-toolkit/examples/OpenGL/advanced/cgfx_texture_array/Makefile.cgfx_texture_array"
+[[decided]]
+ext = "combine_info"
+decision = "exclude"
+date = "2026-11-23"
+example = "home/anthony/.local/share/Steam/ubuntu12_32/steam-runtime/amd64/usr/share/doc/nvidia-cg-toolkit/examples/OpenGL/advanced/combine_program/Makefile.combine_info"
+[[decided]]
+ext = "combine_program"
+decision = "exclude"
+date = "2026-11-23"
+example = "home/anthony/.local/share/Steam/ubuntu12_32/steam-runtime/amd64/usr/share/doc/nvidia-cg-toolkit/examples/OpenGL/advanced/combine_program/Makefile.combine_program"
+[[decided]]
+ext = "custom_state_assignments"
+decision = "exclude"
+date = "2026-11-23"
+example = "home/anthony/.local/share/Steam/ubuntu12_32/steam-runtime/amd64/usr/share/doc/nvidia-cg-toolkit/examples/OpenGL/advanced/custom_state_assignments/Makefile.custom_state_assignments"
+[[decided]]
+ext = "generic_attribs"
+decision = "exclude"
+date = "2026-11-23"
+example = "home/anthony/.local/share/Steam/ubuntu12_32/steam-runtime/amd64/usr/share/doc/nvidia-cg-toolkit/examples/OpenGL/advanced/generic_attribs/Makefile.generic_attribs"
+[[decided]]
+ext = "gs_interp_quad"
+decision = "exclude"
+date = "2026-11-23"
+example = "home/anthony/.local/share/Steam/ubuntu12_32/steam-runtime/amd64/usr/share/doc/nvidia-cg-toolkit/examples/OpenGL/advanced/gs_interp_quad/Makefile.gs_interp_quad"
+[[decided]]
+ext = "gs_md2bump"
+decision = "exclude"
+date = "2026-11-23"
+example = "home/anthony/.local/share/Steam/ubuntu12_32/steam-runtime/amd64/usr/share/doc/nvidia-cg-toolkit/examples/OpenGL/advanced/gs_md2render/Makefile.gs_md2bump"
+[[decided]]
+ext = "gs_md2shadow"
+decision = "exclude"
+date = "2026-11-23"
+example = "home/anthony/.local/share/Steam/ubuntu12_32/steam-runtime/amd64/usr/share/doc/nvidia-cg-toolkit/examples/OpenGL/advanced/gs_md2render/Makefile.gs_md2shadow"
+[[decided]]
+ext = "gs_md2shadowvol"
+decision = "exclude"
+date = "2026-11-23"
+example = "home/anthony/.local/share/Steam/ubuntu12_32/steam-runtime/amd64/usr/share/doc/nvidia-cg-toolkit/examples/OpenGL/advanced/gs_md2render/Makefile.gs_md2shadowvol"
+[[decided]]
+ext = "gs_quadnormal"
+decision = "exclude"
+date = "2026-11-23"
+example = "home/anthony/.local/share/Steam/ubuntu12_32/steam-runtime/amd64/usr/share/doc/nvidia-cg-toolkit/examples/OpenGL/advanced/gs_quadnormal/Makefile.gs_quadnormal"
+[[decided]]
+ext = "gs_shrinky"
+decision = "exclude"
+date = "2026-11-23"
+example = "home/anthony/.local/share/Steam/ubuntu12_32/steam-runtime/amd64/usr/share/doc/nvidia-cg-toolkit/examples/OpenGL/advanced/gs_shrinky/Makefile.gs_shrinky"
+[[decided]]
+ext = "gs_simple"
+decision = "exclude"
+date = "2026-11-23"
+example = "home/anthony/.local/share/Steam/ubuntu12_32/steam-runtime/amd64/usr/share/doc/nvidia-cg-toolkit/examples/OpenGL/advanced/gs_simple/Makefile.gs_simple"
+[[decided]]
+ext = "include_string"
+decision = "exclude"
+date = "2026-11-23"
+example = "home/anthony/.local/share/Steam/ubuntu12_32/steam-runtime/amd64/usr/share/doc/nvidia-cg-toolkit/examples/OpenGL/advanced/include_string/Makefile.include_string"
+[[decided]]
+ext = "interpolation_modifier"
+decision = "exclude"
+date = "2026-11-23"
+example = "home/anthony/.local/share/Steam/ubuntu12_32/steam-runtime/amd64/usr/share/doc/nvidia-cg-toolkit/examples/OpenGL/advanced/interpolation_modifier/Makefile.interpolation_modifier"
+[[decided]]
+ext = "tess_bezier"
+decision = "exclude"
+date = "2026-11-23"
+example = "home/anthony/.local/share/Steam/ubuntu12_32/steam-runtime/amd64/usr/share/doc/nvidia-cg-toolkit/examples/OpenGL/advanced/tess_bezier/Makefile.tess_bezier"
+[[decided]]
+ext = "tess_simple"
+decision = "exclude"
+date = "2026-11-23"
+example = "home/anthony/.local/share/Steam/ubuntu12_32/steam-runtime/amd64/usr/share/doc/nvidia-cg-toolkit/examples/OpenGL/advanced/tess_simple/Makefile.tess_simple"
+[[decided]]
+ext = "texture_array"
+decision = "exclude"
+date = "2026-11-23"
+example = "home/anthony/.local/share/Steam/ubuntu12_32/steam-runtime/amd64/usr/share/doc/nvidia-cg-toolkit/examples/OpenGL/advanced/texture_array/Makefile.texture_array"
+[[decided]]
+ext = "vertex_texture"
+decision = "exclude"
+date = "2026-11-23"
+example = "home/anthony/.local/share/Steam/ubuntu12_32/steam-runtime/amd64/usr/share/doc/nvidia-cg-toolkit/examples/OpenGL/advanced/vertex_texture/Makefile.vertex_texture"
+[[decided]]
+ext = "glew"
+decision = "exclude"
+date = "2026-11-23"
+example = "home/anthony/.local/share/Steam/ubuntu12_32/steam-runtime/amd64/usr/share/doc/nvidia-cg-toolkit/examples/OpenGL/glew/Makefile.glew"
+[[decided]]
+ext = "glewinfo"
+decision = "exclude"
+date = "2026-11-23"
+example = "home/anthony/.local/share/Steam/ubuntu12_32/steam-runtime/amd64/usr/share/doc/nvidia-cg-toolkit/examples/OpenGL/glew/Makefile.glewinfo"
+[[decided]]
+ext = "glewlib"
+decision = "exclude"
+date = "2026-11-23"
+example = "home/anthony/.local/share/Steam/ubuntu12_32/steam-runtime/amd64/usr/share/doc/nvidia-cg-toolkit/examples/OpenGL/glew/Makefile.glewlib"
+[[decided]]
+ext = "visualinfo"
+decision = "exclude"
+date = "2026-11-23"
+example = "home/anthony/.local/share/Steam/ubuntu12_32/steam-runtime/amd64/usr/share/doc/nvidia-cg-toolkit/examples/OpenGL/glew/Makefile.visualinfo"
+[[decided]]
+ext = "cgfxcat"
+decision = "exclude"
+date = "2026-11-23"
+example = "home/anthony/.local/share/Steam/ubuntu12_32/steam-runtime/amd64/usr/share/doc/nvidia-cg-toolkit/examples/Tools/cgfxcat/Makefile.cgfxcat"
+[[decided]]
+ext = "cginfo"
+decision = "exclude"
+date = "2026-11-23"
+example = "home/anthony/.local/share/Steam/ubuntu12_32/steam-runtime/amd64/usr/share/doc/nvidia-cg-toolkit/examples/Tools/cginfo/Makefile.cginfo"
+[[decided]]
+ext = "trace"
+decision = "exclude"
+date = "2026-11-23"
+example = "home/anthony/.local/share/Steam/ubuntu12_32/steam-runtime/amd64/usr/share/doc/nvidia-cg-toolkit/examples/Tools/trace/Makefile.trace"
+[[decided]]
+ext = "tracecg"
+decision = "exclude"
+date = "2026-11-23"
+example = "home/anthony/.local/share/Steam/ubuntu12_32/steam-runtime/amd64/usr/share/doc/nvidia-cg-toolkit/examples/Tools/trace/Makefile.traceCg"
+[[decided]]
+ext = "tracecggl"
+decision = "exclude"
+date = "2026-11-23"
+example = "home/anthony/.local/share/Steam/ubuntu12_32/steam-runtime/amd64/usr/share/doc/nvidia-cg-toolkit/examples/Tools/trace/Makefile.traceCgGL"
+[[decided]]
+ext = "tracegl"
+decision = "exclude"
+date = "2026-11-23"
+example = "home/anthony/.local/share/Steam/ubuntu12_32/steam-runtime/amd64/usr/share/doc/nvidia-cg-toolkit/examples/Tools/trace/Makefile.traceGL"
+[[decided]]
+ext = "traceglut"
+decision = "exclude"
+date = "2026-11-23"
+example = "home/anthony/.local/share/Steam/ubuntu12_32/steam-runtime/amd64/usr/share/doc/nvidia-cg-toolkit/examples/Tools/trace/Makefile.traceGLUT"
+[[decided]]
+ext = "schemas"
+decision = "exclude"
+date = "2026-11-23"
+example = "home/anthony/.local/share/Steam/ubuntu12_32/steam-runtime/amd64/usr/share/gconf/schemas/libcanberra.schemas"
+[[decided]]
+ext = "dict"
+decision = "exclude"
+date = "2026-11-23"
+example = "home/anthony/.local/share/Steam/ubuntu12_32/steam-runtime/amd64/usr/share/gst-plugins-base/license-translations.dict"
+[[decided]]
+ext = "2debian"
+decision = "exclude"
+date = "2026-11-23"
+example = "home/anthony/.local/share/Steam/ubuntu12_32/steam-runtime/amd64/usr/share/lintian/overrides/libsdl1.2debian"
+[[decided]]
+ext = "mo"
+decision = "exclude"
+date = "2026-11-23"
+example = "home/anthony/.local/share/Steam/ubuntu12_32/steam-runtime/amd64/usr/share/locale/af/LC_MESSAGES/gst-plugins-base-0.10.mo"
+[[decided]]
+ext = "gitc28f1bab-1+srt4_i386"
+decision = "exclude"
+date = "2026-11-23"
+example = "home/anthony/.local/share/Steam/ubuntu12_32/steam-runtime/i386/installed/librtmp0_2.4~20110711.gitc28f1bab-1+srt4_i386"
+[[decided]]
+ext = "q-21+srt4_i386"
+decision = "exclude"
+date = "2026-11-23"
+example = "home/anthony/.local/share/Steam/ubuntu12_32/steam-runtime/i386/installed/libwrap0_7.6.q-21+srt4_i386"
+[[decided]]
+ext = "dfsg-3ubuntu4+srt4_i386"
+decision = "exclude"
+date = "2026-11-23"
+example = "home/anthony/.local/share/Steam/ubuntu12_32/steam-runtime/i386/installed/zlib1g_1.2.3.4.dfsg-3ubuntu4+srt4_i386"
+[[decided]]
+ext = "i386"
+decision = "exclude"
+date = "2026-11-23"
+example = "home/anthony/.local/share/Steam/ubuntu12_32/steam-runtime/i386/usr/share/doc/gtk2-engines-pixbuf/changelog.Debian.i386"
+[[decided]]
+ext = "cachedmsg"
+decision = "exclude"
+date = "2026-11-23"
+example = "home/anthony/.local/share/Steam/userdata/11175956/ugcmsgcache/574baacb6a2eecf270b48e9d5fe048bdf935790f.cachedmsg"
+[[decided]]
+ext = "list"
+decision = "exclude"
+date = "2026-11-23"
+example = "home/anthony/.local/share/applications/mimeapps.list"
+[[decided]]
+ext = "icc"
+decision = "exclude"
+date = "2026-11-23"
+example = "home/anthony/.local/share/icc/edid-2e76d41fe7e58938b19cb2ee1210fad6.icc"
+[[decided]]
+ext = "keyring"
+decision = "exclude"
+date = "2026-11-23"
+example = "home/anthony/.local/share/keyrings/login.keyring"
+[[decided]]
+ext = "keystore"
+decision = "exclude"
+date = "2026-11-23"
+example = "home/anthony/.local/share/keyrings/user.keystore"
+[[decided]]
+ext = "sol"
+decision = "exclude"
+date = "2026-11-23"
+example = "home/anthony/.macromedia/Flash_Player/macromedia.com/support/flashplayer/sys/settings.sol"

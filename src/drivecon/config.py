@@ -24,6 +24,7 @@ class Category:
 class FileTypes:
     categories: tuple[Category, ...]
     decided: dict[str, str] = field(default_factory=dict)  # ext -> include|exclude
+    unknown: str = "ask"  # ask: hold and prompt; exclude: skip and list at the end
 
 
 @dataclass(frozen=True)
@@ -77,7 +78,10 @@ def load_file_types(path: Path) -> FileTypes:
         for d in doc.get("decided", [])
         if d["decision"] in ("include", "exclude")
     }
-    return FileTypes(cats, decided)
+    unknown = str(doc.get("unknown", "ask"))
+    if unknown not in ("ask", "exclude"):
+        raise ValueError(f"{path}: unknown must be 'ask' or 'exclude', not {unknown!r}")
+    return FileTypes(cats, decided, unknown)
 
 
 def load_path_rules(path: Path) -> PathRules:

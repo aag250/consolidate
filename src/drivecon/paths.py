@@ -4,7 +4,8 @@ from __future__ import annotations
 
 import hashlib
 import re
-from collections.abc import Callable, Sequence
+from collections import defaultdict
+from collections.abc import Callable, Iterable, Sequence
 from dataclasses import dataclass
 
 from drivecon.config import PhotoRules
@@ -30,6 +31,46 @@ def strip_prefix(segs: Sequence[str], patterns: Sequence[str], ci: bool = True) 
                 out = out[len(p) :]
                 changed = True
                 break
+    return out
+
+
+# Folder names a Windows user profile holds (Vista and later, plus XP). A folder holding
+# at least PROFILE_MIN_FOLDERS of them is treated as a copied profile, whatever it is
+# called ("KG 10.23.21 Backup", "old_laptop/joe"), and merged like Users/<name>/.
+PROFILE_FOLDERS = frozenset(
+    {
+        "desktop", "documents", "downloads", "pictures", "music", "videos", "favorites",
+        "contacts", "links", "saved games", "searches", "3d objects", "appdata", "onedrive",
+        "my documents", "application data", "local settings", "start menu", "cookies",
+    }
+)  # fmt: skip
+PROFILE_MIN_FOLDERS = 3
+
+
+def profile_roots(dirs: Iterable[Sequence[str]]) -> list[tuple[str, ...]]:
+    """Folders that look like a copied user profile, given every known directory path."""
+    children: dict[tuple[str, ...], set[str]] = defaultdict(set)
+    for d in dirs:
+        for i in range(len(d)):
+            children[tuple(d[:i])].add(d[i].lower())
+    found = [
+        p for p, kids in children.items() if len(kids & PROFILE_FOLDERS) >= PROFILE_MIN_FOLDERS
+    ]
+    return sorted(found, key=lambda p: (-len(p), p))  # deepest first: nested copies strip first
+
+
+def _glob_escape(seg: str) -> str:
+    return re.sub(r"([*?\[])", r"[\1]", seg)
+
+
+def profile_prefixes(roots: Sequence[tuple[str, ...]]) -> list[str]:
+    """Strip patterns for detected profiles: <root>/Documents/ (and My Documents/), then <root>/."""
+    out: list[str] = []
+    for r in roots:
+        base = "".join(_glob_escape(s) + "/" for s in r)
+        out += [base + "Documents/", base + "My Documents/"]
+        if base:
+            out.append(base)
     return out
 
 
